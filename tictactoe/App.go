@@ -60,8 +60,7 @@ func (app *App) Draw(screen *ebiten.Image) {
 }
 
 func (app *App) Layout(ow, oh int) (int, int) {
-
-	return app.screenWidth, app.screenHeight
+	return  app.screenWidth,  app.screenHeight
 }
 
 func NewApp() *App {

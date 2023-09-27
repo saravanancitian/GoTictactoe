@@ -4,9 +4,8 @@ import (
 	"image/color"
 	"math/rand"
 	"time"
-
+	"tictactoe/tictactoe/input"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
@@ -268,8 +267,8 @@ func (b *Board) Update(delta int64) {
 		}
 
 	case STATE_HUMAN_PLAYER_TURN:
-		if inpututil.IsMouseButtonJustPressed(ebiten.MouseButton0) {
-			mx, my := ebiten.CursorPosition()
+		mx, my := input.Current().GetPosition();
+		if mx >=0 && my >= 0 {
 			row, col := b.GetSelectedCell(mx, my)
 			if row > -1 && col > -1 {
 				b.numHumanMove++
