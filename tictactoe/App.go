@@ -8,7 +8,7 @@ import (
 
 const(
 	INNER_WIDTH int = 204
-	INNER_HEIGHT int = 304
+	INNER_HEIGHT int = 260
 )
 
 const (

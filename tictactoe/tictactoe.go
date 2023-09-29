@@ -10,6 +10,7 @@ import (
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
 	"github.com/hajimehoshi/ebiten/v2/text"
+	"fmt"
 
 )
 
@@ -54,11 +55,8 @@ type TicTacToe struct{
 	gy int
 
 	txtTimer string
-	txtTimerX int
-	txtTimery int
-
-	txtTurnX int
-	txtTurnY int
+	showTimer bool
+	showTurnText bool
 
 	gameScreenWidth int
 	gameScreenHeight int
@@ -160,9 +158,7 @@ func (t *TicTacToe) Init(rm *ResourceManager, screenWidth int, screenHeight int)
 	y := (screenHeight - t.board.height)/2
 	t.board.SetXY(x, y)
 
-	// m := t.normalFont.Metrics()
-	t.txtTimerX = x
-	t.txtTimery = y -10
+
 	
 	t.overlayColor = color.RGBA{50, 50, 50, 150}
 
@@ -184,11 +180,19 @@ func (t *TicTacToe) ResetBoard() {
 }
 
 func (t *TicTacToe) CalculatePlayTime(delta int64){
-	if t.playtimecalc >= SEC_IN_MILLIS{
-		t.playtime += t.playtimecalc
-		t.playtimecalc = delta
-	} else {
-		t.playtimecalc += delta
+	if !t.isGameover { 
+		if t.playtimecalc >= SEC_IN_MILLIS{
+			t.playtime += t.playtimecalc
+			t.playtimecalc = delta
+
+			tsec := t.playtime  / SEC_IN_MILLIS
+			min := tsec / 60
+			sec := tsec % 60
+			t.txtTimer = fmt.Sprintf("\n%02d:%02d", min, sec)
+
+		} else {
+			t.playtimecalc += delta
+		}
 	}
 }
 
@@ -254,8 +258,21 @@ func (t *TicTacToe) CheckGameOver() (bool, int) {
 
 func(t *TicTacToe) Draw(screen *ebiten.Image){
 
-	text.Draw(screen, t.txtTimer, t.normalFont, t.txtTimerX, t.txtTimery, color.White)
 	t.board.Draw(screen)
+
+	if t.showTurnText{
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate( float64(t.board.x + t.board.width - 60), float64(t.board.y - 5))
+		text.DrawWithOptions(screen, TXT_YOUR_TURN, t.normalFont,op)
+	  }
+
+ 	if t.showTimer{
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate( float64(t.board.x + 5), float64(t.board.y - 30))		
+		 text.DrawWithOptions(screen, t.txtTimer, t.normalFont,  op)
+	}
+
+	
 
 	var x int = 0
 	var y int = 0
@@ -309,8 +326,11 @@ func (t *TicTacToe) Update(delta int64){
 		t.player.aiType = AI_TYPE_AVERAGE
 		t.playtime = 0
 		t.playtimecalc = 0
+		t.showTimer = true
+		t.showTurnText = false
 
 	case STATE_AI_PLAYER_TURN:
+		t.CalculatePlayTime(delta)
 		row, col := t.GetAIMove(t.player.aiType)
 		if row > -1 && col > -1 {
 			t.numAIMove++
@@ -322,6 +342,7 @@ func (t *TicTacToe) Update(delta int64){
 		}
 
 	case STATE_HUMAN_PLAYER_TURN:
+		t.CalculatePlayTime(delta)
 		mx, my := input.Current().GetPosition();
 		if mx >=0 && my >= 0 {
 			row, col := t.board.GetSelectedCell(mx, my)
@@ -332,12 +353,14 @@ func (t *TicTacToe) Update(delta int64){
 				t.animCol = col
 				t.player.crossImgIdx = 0
 				t.state = STATE_ANIMATE_HUMAN_PLAYER
+				t.showTurnText = false
 			}
 		}
 
 	case STATE_GAME_OVER:
 		t.isGameover = true
 	case STATE_ANIMATE_AI_PLAYER:
+		t.CalculatePlayTime(delta)
 		if t.DelayElapsed(delta) {
 			if t.player.circleImgIdx >= NUM_CIRCLE_FRAMES-1 {
 				t.isAnimating = false
@@ -348,6 +371,8 @@ func (t *TicTacToe) Update(delta int64){
 
 					t.state = STATE_GAME_OVER
 				} else {
+					t.showTurnText = true
+
 					t.state = STATE_HUMAN_PLAYER_TURN
 				}
 
@@ -358,7 +383,7 @@ func (t *TicTacToe) Update(delta int64){
 		}
 
 	case STATE_ANIMATE_HUMAN_PLAYER:
-
+		t.CalculatePlayTime(delta)
 		if t.DelayElapsed(delta) {
 			if t.player.crossImgIdx >= NUM_CROSS_FRAMES-1 {
 				t.isAnimating = false
