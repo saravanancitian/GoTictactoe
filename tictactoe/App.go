@@ -8,7 +8,7 @@ import (
 
 const(
 	INNER_WIDTH int = 204
-	INNER_HEIGHT int = 260
+	INNER_HEIGHT int = 250
 )
 
 const (
@@ -23,6 +23,8 @@ const (
 
 type App struct {
 	ttt *TicTacToe
+
+	gcallback func()
 
 	screenWidth  int
 	screenHeight int
@@ -44,7 +46,7 @@ func (app *App) Init() {
 func (app *App) Update() error {
 	switch app.state {
 	case APP_STATE_INIT:
-		app.ttt = NewTicTacToe(app.rm, app.screenWidth, app.screenHeight)
+		app.ttt = NewTicTacToe(app.rm, app.screenWidth, app.screenHeight, app.gcallback)
 		app.state = APP_STATE_RUNNING
 	case APP_STATE_RUNNING:
 		app.curTime = time.Now().UnixMilli()
@@ -68,6 +70,10 @@ func (app *App) Layout(ow, oh int) (int, int) {
 	app.screenWidth = INNER_WIDTH
 	app.screenHeight = INNER_HEIGHT
 	return  INNER_WIDTH, INNER_HEIGHT
+}
+
+func (app *App) RegisterIGameCallback(callback func()){
+	app.gcallback = callback
 }
 
 func NewApp() *App {

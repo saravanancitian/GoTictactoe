@@ -47,7 +47,8 @@ const (
 
 
 type TicTacToe struct{
-	
+	GameOverCallBack func()
+
 	youwin         *ebiten.Image
 	loser          *ebiten.Image
 	tide           *ebiten.Image
@@ -60,6 +61,7 @@ type TicTacToe struct{
 
 	gameScreenWidth int
 	gameScreenHeight int
+
 
 
 	
@@ -92,6 +94,10 @@ type TicTacToe struct{
 
 	overlayColor  color.RGBA
 	rm *ResourceManager
+}
+
+func (t *TicTacToe) SetCallback(callback func()){
+	t.GameOverCallBack = callback
 }
 
 func (t *TicTacToe) LoadSprite(rm *ResourceManager) {
@@ -130,16 +136,17 @@ func (t *TicTacToe) LoadSprite(rm *ResourceManager) {
 }
 
 
-func NewTicTacToe(rm *ResourceManager, screenWidth int, screenHeight int) *TicTacToe{
+func NewTicTacToe(rm *ResourceManager, screenWidth int, screenHeight int, callback func()) *TicTacToe{
 	var tictactoe = new(TicTacToe)
-	tictactoe.Init(rm, screenWidth, screenHeight)
+	tictactoe.Init(rm, screenWidth, screenHeight, callback)
 	return tictactoe
 }
 
 
-func (t *TicTacToe) Init(rm *ResourceManager, screenWidth int, screenHeight int){
+func (t *TicTacToe) Init(rm *ResourceManager, screenWidth int, screenHeight int, callback func()){
 	rand.Seed(time.Now().UnixNano())
 	t.rm = rm
+	t.GameOverCallBack = callback
 	t.LoadSprite(rm)
 
 	t.gx = 0
@@ -359,6 +366,7 @@ func (t *TicTacToe) Update(delta int64){
 
 	case STATE_GAME_OVER:
 		t.isGameover = true
+		t.GameOverCallBack()
 	case STATE_ANIMATE_AI_PLAYER:
 		t.CalculatePlayTime(delta)
 		if t.DelayElapsed(delta) {
