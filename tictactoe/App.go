@@ -6,8 +6,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-const(
-	INNER_WIDTH int = 204
+const (
+	INNER_WIDTH  int = 204
 	INNER_HEIGHT int = 250
 )
 
@@ -24,7 +24,7 @@ const (
 type App struct {
 	ttt *TicTacToe
 
-	gcallback func()
+	gameovercallback func(winner int)
 
 	screenWidth  int
 	screenHeight int
@@ -46,7 +46,7 @@ func (app *App) Init() {
 func (app *App) Update() error {
 	switch app.state {
 	case APP_STATE_INIT:
-		app.ttt = NewTicTacToe(app.rm, app.screenWidth, app.screenHeight, app.gcallback)
+		app.ttt = NewTicTacToe(app.rm, app.screenWidth, app.screenHeight, app.gameovercallback)
 		app.state = APP_STATE_RUNNING
 	case APP_STATE_RUNNING:
 		app.curTime = time.Now().UnixMilli()
@@ -58,9 +58,6 @@ func (app *App) Update() error {
 	return nil
 }
 
-
-
-
 func (app *App) Draw(screen *ebiten.Image) {
 	app.ttt.Draw(screen)
 }
@@ -69,11 +66,15 @@ func (app *App) Layout(ow, oh int) (int, int) {
 
 	app.screenWidth = INNER_WIDTH
 	app.screenHeight = INNER_HEIGHT
-	return  INNER_WIDTH, INNER_HEIGHT
+	return INNER_WIDTH, INNER_HEIGHT
 }
 
-func (app *App) RegisterIGameCallback(callback func()){
-	app.gcallback = callback
+func (app *App) RegisterIGameCallback(callback func(int)) {
+	app.gameovercallback = callback
+}
+
+func (app *App) PlayAgain() {
+	app.ttt.StartNewGame()
 }
 
 func NewApp() *App {

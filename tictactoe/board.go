@@ -11,8 +11,7 @@ const (
 	GAMEOVER_WIDTH int = 159
 	GAMEOVER_HEIGHT int = 93
 	MARGIN	int = 4
-	ANIM_DELAY int64 = 100
-	SEC_IN_MILLIS int64 = 1000
+
 )
 
 type Board struct {

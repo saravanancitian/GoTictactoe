@@ -7,12 +7,11 @@ import (
 )
 
 type IGameCallback interface {
-	GameOverCallBack()
-
+	GameOverCallBack(winner int)
 }
 
-
 var game *tictactoe.App
+
 ////go run github.com/hajimehoshi/ebiten/v2/cmd/ebitenmobile  bind -target android -javapkg com.tictactoe.tictactoe -o ./bin/tictactoe.aar .\mobile
 
 func init() {
@@ -20,17 +19,19 @@ func init() {
 	// For more details, see
 	// * https://pkg.go.dev/github.com/hajimehoshi/ebiten/v2#Game
 
-	game= tictactoe.NewApp()
+	game = tictactoe.NewApp()
 
 	mobile.SetGame(game)
 }
 
-
-
-
 func RegisterGameCallback(callback IGameCallback) {
-	game.RegisterIGameCallback(func(){callback.GameOverCallBack()})   
+	game.RegisterIGameCallback(func(winner int) { callback.GameOverCallBack(winner) })
 }
+
+func PlayAgain() {
+	game.PlayAgain()
+}
+
 // Dummy is a dummy exported function.
 //
 // gomobile doesn't compile a package that doesn't include any exported function.

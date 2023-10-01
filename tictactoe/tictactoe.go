@@ -1,20 +1,21 @@
 package tictactoe
 
 import (
+	"fmt"
 	"image/color"
 	"math/rand"
-	"time"
 	"tictactoe/tictactoe/input"
+	"time"
+
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
-	"github.com/hajimehoshi/ebiten/v2/text"
-	"fmt"
-
 )
 
 const (
+	STATE_GAME_OVER_HALT       int = 0
 	STATE_INIT_NEW_GAME        int = 1
 	STATE_AI_PLAYER_TURN       int = 2
 	STATE_HUMAN_PLAYER_TURN    int = 3
@@ -22,7 +23,6 @@ const (
 	STATE_ANIMATE_AI_PLAYER    int = 5
 	STATE_ANIMATE_HUMAN_PLAYER int = 6
 )
-
 
 const (
 	HUMAN_PLAYER int = 1
@@ -36,67 +36,62 @@ const (
 	AI_TYPE_GOOD          int = 2
 )
 
-
 const (
-	NUM_COL int = 3
-	NUM_ROW int = 3
+	NUM_COL                   int = 3
+	NUM_ROW                   int = 3
 	MAX_MOVES_CHECK_GAME_OVER int = 5
 
 	TXT_YOUR_TURN string = "Your Turn"
+
+	ANIM_DELAY    int64 = 100
+	SEC_IN_MILLIS int64 = 1000
 )
 
+type TicTacToe struct {
+	GameOverCallBack func(int)
 
-type TicTacToe struct{
-	GameOverCallBack func()
+	youwin *ebiten.Image
+	loser  *ebiten.Image
+	tide   *ebiten.Image
+	gx     int
+	gy     int
 
-	youwin         *ebiten.Image
-	loser          *ebiten.Image
-	tide           *ebiten.Image
-	gx int
-	gy int
-
-	txtTimer string
-	showTimer bool
-	showTurnText bool
-
-	gameScreenWidth int
+	gameScreenWidth  int
 	gameScreenHeight int
 
-
-
-	
 	cell [NUM_ROW][NUM_COL]int
-	
-	JustAnotherHand_ttf *opentype.Font
-	normalFont font.Face
 
+	JustAnotherHand_ttf *opentype.Font
+	normalFont          font.Face
+	board               *Board
+	player              *Player
+
+	overlayColor color.RGBA
+	rm           *ResourceManager
 
 	state int
 
 	numHumanMove int
 	numAIMove    int
 
-	winner       int
+	winner int
 
-	playtime int64
+	playtime     int64
 	playtimecalc int64
 
 	animtime    int64
 	isAnimating bool
 	isGameover  bool
 
-
 	animRow int
 	animCol int
 
-	board *Board
-	player *Player
-
-	overlayColor  color.RGBA
-	rm *ResourceManager
+	txtTimer     string
+	showTimer    bool
+	showTurnText bool
 }
 
-func (t *TicTacToe) SetCallback(callback func()){
+func (t *TicTacToe) SetCallback(callback func(int)) {
 	t.GameOverCallBack = callback
 }
 
@@ -131,44 +126,34 @@ func (t *TicTacToe) LoadSprite(rm *ResourceManager) {
 		panic(err)
 	}
 
-
-
 }
 
-
-func NewTicTacToe(rm *ResourceManager, screenWidth int, screenHeight int, callback func()) *TicTacToe{
+func NewTicTacToe(rm *ResourceManager, screenWidth int, screenHeight int, callback func(int)) *TicTacToe {
 	var tictactoe = new(TicTacToe)
 	tictactoe.Init(rm, screenWidth, screenHeight, callback)
 	return tictactoe
 }
 
-
-func (t *TicTacToe) Init(rm *ResourceManager, screenWidth int, screenHeight int, callback func()){
+func (t *TicTacToe) Init(rm *ResourceManager, screenWidth int, screenHeight int, callback func(int)) {
 	rand.Seed(time.Now().UnixNano())
 	t.rm = rm
 	t.GameOverCallBack = callback
 	t.LoadSprite(rm)
 
 	t.gx = 0
-	t.gy = 0	
+	t.gy = 0
 	t.gameScreenWidth = screenWidth
 	t.gameScreenHeight = screenHeight
-	
+
 	t.board = NewBoard()
 	t.player = NewPlayer()
 	t.player.LoadSprite(rm)
 
-	t.txtTimer = "00:00"
-
-	
-	x := (screenWidth - t.board.width)/2 
-	y := (screenHeight - t.board.height)/2
+	x := (screenWidth - t.board.width) / 2
+	y := (screenHeight - t.board.height) / 2
 	t.board.SetXY(x, y)
 
-
-	
 	t.overlayColor = color.RGBA{50, 50, 50, 150}
-
 
 	t.StartNewGame()
 }
@@ -176,7 +161,6 @@ func (t *TicTacToe) Init(rm *ResourceManager, screenWidth int, screenHeight int,
 func (t *TicTacToe) StartNewGame() {
 	t.state = STATE_INIT_NEW_GAME
 }
-
 
 func (t *TicTacToe) ResetBoard() {
 	for i := 0; i < NUM_ROW; i++ {
@@ -186,13 +170,13 @@ func (t *TicTacToe) ResetBoard() {
 	}
 }
 
-func (t *TicTacToe) CalculatePlayTime(delta int64){
-	if !t.isGameover { 
-		if t.playtimecalc >= SEC_IN_MILLIS{
+func (t *TicTacToe) CalculatePlayTime(delta int64) {
+	if !t.isGameover {
+		if t.playtimecalc >= SEC_IN_MILLIS {
 			t.playtime += t.playtimecalc
 			t.playtimecalc = delta
 
-			tsec := t.playtime  / SEC_IN_MILLIS
+			tsec := t.playtime / SEC_IN_MILLIS
 			min := tsec / 60
 			sec := tsec % 60
 			t.txtTimer = fmt.Sprintf("\n%02d:%02d", min, sec)
@@ -202,7 +186,6 @@ func (t *TicTacToe) CalculatePlayTime(delta int64){
 		}
 	}
 }
-
 
 func (t *TicTacToe) CanPlayerWin(row int, col int, playerType int) bool {
 	var isWin bool = false
@@ -262,30 +245,27 @@ func (t *TicTacToe) CheckGameOver() (bool, int) {
 	return isGameOver, winner
 }
 
-
-func(t *TicTacToe) Draw(screen *ebiten.Image){
+func (t *TicTacToe) Draw(screen *ebiten.Image) {
 
 	t.board.Draw(screen)
 
-	if t.showTurnText{
+	if t.showTurnText {
 		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Translate( float64(t.board.x + t.board.width - 60), float64(t.board.y - 5))
-		text.DrawWithOptions(screen, TXT_YOUR_TURN, t.normalFont,op)
-	  }
-
- 	if t.showTimer{
-		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Translate( float64(t.board.x + 5), float64(t.board.y - 30))		
-		 text.DrawWithOptions(screen, t.txtTimer, t.normalFont,  op)
+		op.GeoM.Translate(float64(t.board.x+t.board.width-60), float64(t.board.y-5))
+		text.DrawWithOptions(screen, TXT_YOUR_TURN, t.normalFont, op)
 	}
 
-	
+	if t.showTimer {
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(float64(t.board.x+5), float64(t.board.y-30))
+		text.DrawWithOptions(screen, t.txtTimer, t.normalFont, op)
+	}
 
 	var x int = 0
 	var y int = 0
 
 	for i := 0; i < NUM_ROW; i++ {
-		x = t.board.x + (t.board.cellwithmargine* i) + t.board.margin
+		x = t.board.x + (t.board.cellwithmargine * i) + t.board.margin
 
 		for j := 0; j < NUM_COL; j++ {
 			y = t.board.y + (t.board.cellwithmargine * j) + t.board.margin
@@ -295,46 +275,59 @@ func(t *TicTacToe) Draw(screen *ebiten.Image){
 		}
 	}
 
-
-	if t.isGameover {
-		vector.DrawFilledRect(screen, float32(t.board.x), float32(t.board.y), float32(t.board.width), float32(t.board.height), t.overlayColor, false)
-		var goimg *ebiten.Image
-		if t.winner == HUMAN_PLAYER {
-			goimg = t.youwin
-		} else if t.winner == AI_PLAYER {
-			goimg = t.loser
-		} else {
-			goimg = t.tide
-		}
-
-		gx := t.board.x + (t.board.width-GAMEOVER_WIDTH)/2
-		gy := t.board.y + (t.board.height-GAMEOVER_HEIGHT)/2
-
-		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Translate(float64(gx), float64(gy))
-		screen.DrawImage(goimg, op)
-
+	if !IsMobileBuild() && t.isGameover {
+		t.DrawGameOver(screen)
 	}
 }
 
+func (t *TicTacToe) DrawGameOver(screen *ebiten.Image) {
 
+	vector.DrawFilledRect(screen, float32(t.board.x), float32(t.board.y), float32(t.board.width), float32(t.board.height), t.overlayColor, false)
+	var goimg *ebiten.Image
+	if t.winner == HUMAN_PLAYER {
+		goimg = t.youwin
+	} else if t.winner == AI_PLAYER {
+		goimg = t.loser
+	} else {
+		goimg = t.tide
+	}
 
+	gx := t.board.x + (t.board.width-GAMEOVER_WIDTH)/2
+	gy := t.board.y + (t.board.height-GAMEOVER_HEIGHT)/2
 
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(float64(gx), float64(gy))
+	screen.DrawImage(goimg, op)
+}
 
-
-func (t *TicTacToe) Update(delta int64){
+func (t *TicTacToe) Update(delta int64) {
 	switch t.state {
+	case STATE_GAME_OVER_HALT:
+		if !IsMobileBuild() {
+			if t.DelayElapsed(delta) {
+				t.StartNewGame()
+			}
+		}
+
 	case STATE_INIT_NEW_GAME:
 		t.ResetBoard()
+
 		t.numAIMove = 0
 		t.numHumanMove = 0
-	
-		t.state = STATE_AI_PLAYER_TURN
-		t.player.aiType = AI_TYPE_AVERAGE
+		t.winner = -1000
 		t.playtime = 0
 		t.playtimecalc = 0
+		t.animtime = 0
+		t.isAnimating = false
+		t.isGameover = false
+		t.animRow = -1
+		t.animCol = -1
+		t.txtTimer = "00:00"
 		t.showTimer = true
 		t.showTurnText = false
+
+		t.state = STATE_AI_PLAYER_TURN
+		t.player.aiType = AI_TYPE_AVERAGE
 
 	case STATE_AI_PLAYER_TURN:
 		t.CalculatePlayTime(delta)
@@ -350,8 +343,8 @@ func (t *TicTacToe) Update(delta int64){
 
 	case STATE_HUMAN_PLAYER_TURN:
 		t.CalculatePlayTime(delta)
-		mx, my := input.Current().GetPosition();
-		if mx >=0 && my >= 0 {
+		mx, my := input.Current().GetPosition()
+		if mx >= 0 && my >= 0 {
 			row, col := t.board.GetSelectedCell(mx, my)
 			if row > -1 && col > -1 {
 				t.numHumanMove++
@@ -366,7 +359,13 @@ func (t *TicTacToe) Update(delta int64){
 
 	case STATE_GAME_OVER:
 		t.isGameover = true
-		t.GameOverCallBack()
+		if IsMobileBuild() && t.GameOverCallBack != nil {
+			t.GameOverCallBack(t.winner)
+		} else {
+			t.SetDelay(3 * SEC_IN_MILLIS)
+		}
+		t.state = STATE_GAME_OVER_HALT
+
 	case STATE_ANIMATE_AI_PLAYER:
 		t.CalculatePlayTime(delta)
 		if t.DelayElapsed(delta) {
@@ -413,10 +412,14 @@ func (t *TicTacToe) Update(delta int64){
 	}
 }
 
-
 func (t *TicTacToe) SetAnimation() {
-	t.animtime = ANIM_DELAY
 	t.isAnimating = true
+	t.SetDelay(ANIM_DELAY)
+}
+
+func (t *TicTacToe) SetDelay(delay int64) {
+	t.animtime = delay
+
 }
 
 func (t *TicTacToe) DelayElapsed(delta int64) bool {
