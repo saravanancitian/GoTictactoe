@@ -7,7 +7,7 @@ import (
 )
 
 type IGameCallback interface {
-	GameOverCallBack(winner int)
+	GameOverCallBack(winner int, duration int64)
 }
 
 var game *tictactoe.App
@@ -25,11 +25,19 @@ func init() {
 }
 
 func RegisterGameCallback(callback IGameCallback) {
-	game.RegisterIGameCallback(func(winner int) { callback.GameOverCallBack(winner) })
+	game.RegisterIGameCallback(func(winner int, duration int64) { callback.GameOverCallBack(winner, duration) })
 }
 
 func PlayAgain() {
 	game.PlayAgain()
+}
+
+func Pause() {
+	game.Pause()
+}
+
+func Resume() {
+	game.Resume()
 }
 
 // Dummy is a dummy exported function.

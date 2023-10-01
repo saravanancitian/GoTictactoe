@@ -48,7 +48,7 @@ const (
 )
 
 type TicTacToe struct {
-	GameOverCallBack func(int)
+	GameOverCallBack func(int, int64)
 
 	youwin *ebiten.Image
 	loser  *ebiten.Image
@@ -86,12 +86,14 @@ type TicTacToe struct {
 	animRow int
 	animCol int
 
-	txtTimer     string
-	showTimer    bool
-	showTurnText bool
+	txtTimer  string
+	showTimer bool
+	showMsg   bool
+
+	txtMsg string
 }
 
-func (t *TicTacToe) SetCallback(callback func(int)) {
+func (t *TicTacToe) SetCallback(callback func(int, int64)) {
 	t.GameOverCallBack = callback
 }
 
@@ -128,13 +130,13 @@ func (t *TicTacToe) LoadSprite(rm *ResourceManager) {
 
 }
 
-func NewTicTacToe(rm *ResourceManager, screenWidth int, screenHeight int, callback func(int)) *TicTacToe {
+func NewTicTacToe(rm *ResourceManager, screenWidth int, screenHeight int, callback func(int, int64)) *TicTacToe {
 	var tictactoe = new(TicTacToe)
 	tictactoe.Init(rm, screenWidth, screenHeight, callback)
 	return tictactoe
 }
 
-func (t *TicTacToe) Init(rm *ResourceManager, screenWidth int, screenHeight int, callback func(int)) {
+func (t *TicTacToe) Init(rm *ResourceManager, screenWidth int, screenHeight int, callback func(int, int64)) {
 	rand.Seed(time.Now().UnixNano())
 	t.rm = rm
 	t.GameOverCallBack = callback
@@ -249,10 +251,10 @@ func (t *TicTacToe) Draw(screen *ebiten.Image) {
 
 	t.board.Draw(screen)
 
-	if t.showTurnText {
+	if t.showMsg {
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(float64(t.board.x+t.board.width-60), float64(t.board.y-5))
-		text.DrawWithOptions(screen, TXT_YOUR_TURN, t.normalFont, op)
+		text.DrawWithOptions(screen, t.txtMsg, t.normalFont, op)
 	}
 
 	if t.showTimer {
@@ -324,7 +326,8 @@ func (t *TicTacToe) Update(delta int64) {
 		t.animCol = -1
 		t.txtTimer = "00:00"
 		t.showTimer = true
-		t.showTurnText = false
+		t.showMsg = false
+		t.txtMsg = TXT_YOUR_TURN
 
 		t.state = STATE_AI_PLAYER_TURN
 		t.player.aiType = AI_TYPE_AVERAGE
@@ -353,14 +356,22 @@ func (t *TicTacToe) Update(delta int64) {
 				t.animCol = col
 				t.player.crossImgIdx = 0
 				t.state = STATE_ANIMATE_HUMAN_PLAYER
-				t.showTurnText = false
+				t.showMsg = false
 			}
 		}
 
 	case STATE_GAME_OVER:
 		t.isGameover = true
+		t.showMsg = true
+		t.txtMsg = "Tied"
+		if t.winner == HUMAN_PLAYER {
+			t.txtMsg = "You Win"
+		} else if t.winner == AI_PLAYER {
+			t.txtMsg = "You Lose"
+		}
+
 		if IsMobileBuild() && t.GameOverCallBack != nil {
-			t.GameOverCallBack(t.winner)
+			t.GameOverCallBack(t.winner, t.playtime)
 		} else {
 			t.SetDelay(3 * SEC_IN_MILLIS)
 		}
@@ -378,7 +389,7 @@ func (t *TicTacToe) Update(delta int64) {
 
 					t.state = STATE_GAME_OVER
 				} else {
-					t.showTurnText = true
+					t.showMsg = true
 
 					t.state = STATE_HUMAN_PLAYER_TURN
 				}

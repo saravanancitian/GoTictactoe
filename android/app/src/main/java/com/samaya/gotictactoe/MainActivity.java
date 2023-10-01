@@ -8,6 +8,8 @@ import android.view.MenuItem;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.tictactoe.tictactoe.mobile.EbitenView;
 import com.tictactoe.tictactoe.mobile.IGameCallback;
 import com.tictactoe.tictactoe.mobile.Mobile;
@@ -19,14 +21,20 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
     public static final int HUMAN_PLAYER  = 1;
     public static final int AI_PLAYER = -1;
 
+    private AdView adView;
+
+    private  AboutDialog aboutDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
            setContentView(R.layout.activity_main);
         Seq.setContext(getApplicationContext());
-
         Mobile.registerGameCallback(this);
+        adView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
+        aboutDialog = new AboutDialog();
 
     }
 
@@ -36,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
         return true;
     }
 
-    private EbitenView getEbitenView() {
+    public EbitenView getEbitenView() {
         return this.findViewById(R.id.ebitenview);
     }
 
@@ -48,6 +56,9 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
 
     @Override
     protected void onPause() {
+        if (adView != null) {
+            adView.pause();
+        }
         super.onPause();
         this.getEbitenView().suspendGame();
     }
@@ -55,7 +66,18 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
     @Override
     protected void onResume() {
         super.onResume();
+        if (adView != null) {
+            adView.resume();
+        }
         this.getEbitenView().resumeGame();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (adView != null) {
+            adView.destroy();
+        }
+        super.onDestroy();
     }
 
     @Override
@@ -65,7 +87,9 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
             Mobile.playAgain();
             return  true;
         } else if(item.getItemId() == R.id.about) {
-            //TODO: show about dialog
+
+            aboutDialog.show(getSupportFragmentManager(),"About");
+            Mobile.pause();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -73,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
     }
 
     @Override
-    public void gameOverCallBack(long winner) {
+    public void gameOverCallBack(long winner, long duration) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -96,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
                         dialog.cancel();
                     }
                 });
+
                 AlertDialog dialog = builder.create();
                 dialog.show();
             }
