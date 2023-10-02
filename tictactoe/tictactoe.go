@@ -22,6 +22,7 @@ const (
 	STATE_GAME_OVER            int = 4
 	STATE_ANIMATE_AI_PLAYER    int = 5
 	STATE_ANIMATE_HUMAN_PLAYER int = 6
+	GAME_TIDE                  int = 0
 )
 
 const (
@@ -91,6 +92,10 @@ type TicTacToe struct {
 	showMsg   bool
 
 	txtMsg string
+
+	random        *rand.Rand
+	prevTurnStart int
+	toggleRand    bool
 }
 
 func (t *TicTacToe) SetCallback(callback func(int, int64)) {
@@ -137,7 +142,8 @@ func NewTicTacToe(rm *ResourceManager, screenWidth int, screenHeight int, callba
 }
 
 func (t *TicTacToe) Init(rm *ResourceManager, screenWidth int, screenHeight int, callback func(int, int64)) {
-	rand.Seed(time.Now().UnixNano())
+
+	t.random = rand.New(rand.NewSource(time.Now().UnixNano()))
 	t.rm = rm
 	t.GameOverCallBack = callback
 	t.LoadSprite(rm)
@@ -157,6 +163,7 @@ func (t *TicTacToe) Init(rm *ResourceManager, screenWidth int, screenHeight int,
 
 	t.overlayColor = color.RGBA{50, 50, 50, 150}
 
+	t.prevTurnStart = 0
 	t.StartNewGame()
 }
 
@@ -302,6 +309,46 @@ func (t *TicTacToe) DrawGameOver(screen *ebiten.Image) {
 	screen.DrawImage(goimg, op)
 }
 
+func (t *TicTacToe) SetStartTurn() {
+	var turn int = AI_PLAYER
+	if t.winner == GAME_TIDE {
+		if t.prevTurnStart == 0 {
+			var trn = []int{AI_PLAYER, HUMAN_PLAYER}
+			turn = trn[t.random.Intn(2)]
+
+		} else if t.prevTurnStart == AI_PLAYER {
+			turn = HUMAN_PLAYER
+		} else if t.prevTurnStart == HUMAN_PLAYER {
+			turn = AI_PLAYER
+		}
+	} else if t.winner == AI_PLAYER {
+		turn = AI_PLAYER
+	} else if t.winner == HUMAN_PLAYER {
+		turn = HUMAN_PLAYER
+	}
+
+	if turn == AI_PLAYER {
+		t.state = STATE_AI_PLAYER_TURN
+		t.prevTurnStart = AI_PLAYER
+		t.showMsg = false
+
+		t.player.aiType = AI_TYPE_AVERAGE
+
+		if t.toggleRand {
+			var aitypes = []int{AI_TYPE_AVERAGE, AI_TYPE_BELOW_AVERAGE}
+			t.player.aiType = aitypes[t.random.Intn(2)]
+		}
+		t.toggleRand = !t.toggleRand
+
+	} else if turn == HUMAN_PLAYER {
+		t.state = STATE_HUMAN_PLAYER_TURN
+		t.prevTurnStart = HUMAN_PLAYER
+		t.showMsg = true
+
+	}
+
+}
+
 func (t *TicTacToe) Update(delta int64) {
 	switch t.state {
 	case STATE_GAME_OVER_HALT:
@@ -313,7 +360,7 @@ func (t *TicTacToe) Update(delta int64) {
 
 	case STATE_INIT_NEW_GAME:
 		t.ResetBoard()
-
+		t.SetStartTurn()
 		t.numAIMove = 0
 		t.numHumanMove = 0
 		t.winner = -1000
@@ -326,14 +373,15 @@ func (t *TicTacToe) Update(delta int64) {
 		t.animCol = -1
 		t.txtTimer = "00:00"
 		t.showTimer = true
-		t.showMsg = false
 		t.txtMsg = TXT_YOUR_TURN
-
-		t.state = STATE_AI_PLAYER_TURN
-		t.player.aiType = AI_TYPE_AVERAGE
 
 	case STATE_AI_PLAYER_TURN:
 		t.CalculatePlayTime(delta)
+
+		if t.player.aiType == AI_TYPE_BELOW_AVERAGE && t.numAIMove > 2 {
+			var aitypes = []int{AI_TYPE_AVERAGE, AI_TYPE_BELOW_AVERAGE}
+			t.player.aiType = aitypes[t.random.Intn(2)]
+		}
 		row, col := t.GetAIMove(t.player.aiType)
 		if row > -1 && col > -1 {
 			t.numAIMove++
@@ -549,8 +597,8 @@ func (t *TicTacToe) GetAIMove(aiType int) (int, int) {
 		if t.numAIMove == 0 {
 
 			for cnt := 0; cnt < 9; cnt++ {
-				i := rand.Intn(NUM_ROW)
-				j := rand.Intn(NUM_COL)
+				i := t.random.Intn(NUM_ROW)
+				j := t.random.Intn(NUM_COL)
 				if t.cell[i][j] == 0 {
 					row = i
 					col = j
@@ -592,8 +640,8 @@ func (t *TicTacToe) GetAIMove(aiType int) (int, int) {
 
 			if row == -1 {
 				for cnt := 0; cnt < 9; cnt++ {
-					i := rand.Intn(NUM_ROW)
-					j := rand.Intn(NUM_COL)
+					i := t.random.Intn(NUM_ROW)
+					j := t.random.Intn(NUM_COL)
 					if t.cell[i][j] == 0 {
 						row = i
 						col = j
@@ -649,8 +697,8 @@ func (t *TicTacToe) GetAIMove(aiType int) (int, int) {
 			if row == -1 {
 
 				for cnt := 0; cnt < 9; cnt++ {
-					i := rand.Intn(NUM_ROW)
-					j := rand.Intn(NUM_COL)
+					i := t.random.Intn(NUM_ROW)
+					j := t.random.Intn(NUM_COL)
 					if t.cell[i][j] == 0 {
 						row = i
 						col = j
