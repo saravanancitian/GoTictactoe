@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.tictactoe.tictactoe.mobile.EbitenView;
 import com.tictactoe.tictactoe.mobile.IGameCallback;
 import com.tictactoe.tictactoe.mobile.Mobile;
@@ -102,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
             @Override
             public void run() {
                 String message  =  winner == HUMAN_PLAYER? "You Win" : winner == AI_PLAYER ? "You Lose" : "Tide the Game";
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(MainActivity.this);
                 builder.setMessage(message).setTitle("Game Over");
                 builder.setPositiveButton("Play Again", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
