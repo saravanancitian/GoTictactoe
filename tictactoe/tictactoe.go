@@ -2,6 +2,7 @@ package tictactoe
 
 import (
 	"fmt"
+	"image"
 	"image/color"
 	"math/rand"
 	"tictactoe/tictactoe/input"
@@ -96,6 +97,9 @@ type TicTacToe struct {
 	random        *rand.Rand
 	prevTurnStart int
 	toggleRand    bool
+
+	s1 image.Point
+	s2 image.Point
 }
 
 func (t *TicTacToe) SetCallback(callback func(int, int64)) {
@@ -201,27 +205,100 @@ func (t *TicTacToe) CanPlayerWin(row int, col int, playerType int) bool {
 
 	if row == 0 && col == 0 {
 		//check col, row, dia
-		isWin = (t.cell[row+1][col] == playerType && t.cell[row+2][col] == playerType || t.cell[row][col+1] == playerType && t.cell[row][col+2] == playerType || t.cell[row+1][col+1] == playerType && t.cell[row+2][col+2] == playerType)
+		isWin = (t.cell[1][0] == playerType && t.cell[2][0] == playerType || t.cell[0][1] == playerType && t.cell[0][2] == playerType || t.cell[1][1] == playerType && t.cell[2][2] == playerType)
 	} else if row == 0 && col == 2 {
-		isWin = (t.cell[row+1][col] == playerType && t.cell[row+2][col] == playerType || t.cell[row][col-1] == playerType && t.cell[row][col-2] == playerType || t.cell[row+1][col-1] == playerType && t.cell[row+2][col-2] == playerType)
+		isWin = (t.cell[1][2] == playerType && t.cell[2][2] == playerType || t.cell[0][1] == playerType && t.cell[0][0] == playerType || t.cell[1][1] == playerType && t.cell[2][0] == playerType)
 	} else if row == 2 && col == 0 {
-		isWin = (t.cell[row-1][col] == playerType && t.cell[row-2][col] == playerType || t.cell[row][col+1] == playerType && t.cell[row][col+2] == playerType || t.cell[row-1][col+1] == playerType && t.cell[row-2][col+2] == playerType)
+		isWin = (t.cell[1][0] == playerType && t.cell[0][0] == playerType || t.cell[2][1] == playerType && t.cell[2][2] == playerType || t.cell[1][1] == playerType && t.cell[0][2] == playerType)
 	} else if row == 2 && col == 2 {
-		isWin = (t.cell[row-1][col] == playerType && t.cell[row-2][col] == playerType || t.cell[row][col-1] == playerType && t.cell[row][col-2] == playerType || t.cell[row-1][col-1] == playerType && t.cell[row-2][col-2] == playerType)
+		isWin = (t.cell[1][2] == playerType && t.cell[0][2] == playerType || t.cell[2][1] == playerType && t.cell[2][0] == playerType || t.cell[1][1] == playerType && t.cell[0][0] == playerType)
 	} else if row == 1 && col == 1 {
-		isWin = (t.cell[row-1][col] == playerType && t.cell[row+1][col] == playerType || t.cell[row][col-1] == playerType && t.cell[row][col+1] == playerType || t.cell[row-1][col-1] == playerType && t.cell[row+1][col+1] == playerType)
+		isWin = (t.cell[0][1] == playerType && t.cell[2][1] == playerType || t.cell[1][0] == playerType && t.cell[1][2] == playerType || t.cell[0][0] == playerType && t.cell[2][2] == playerType || t.cell[2][0] == playerType && t.cell[0][2] == playerType)
 	} else if row == 0 && col == 1 {
-		isWin = (t.cell[row][col-1] == playerType && t.cell[row][col+1] == playerType || t.cell[row+1][col] == playerType && t.cell[row+2][col] == playerType)
+		isWin = (t.cell[0][0] == playerType && t.cell[0][2] == playerType || t.cell[1][1] == playerType && t.cell[2][1] == playerType)
 	} else if row == 1 && col == 0 {
-		isWin = (t.cell[row][col+1] == playerType && t.cell[row][col+2] == playerType || t.cell[row-1][col] == playerType && t.cell[row+1][col] == playerType)
+		isWin = (t.cell[1][1] == playerType && t.cell[1][2] == playerType || t.cell[0][0] == playerType && t.cell[2][0] == playerType)
 	} else if row == 2 && col == 1 {
-		isWin = (t.cell[row][col-1] == playerType && t.cell[row][col+1] == playerType || t.cell[row-1][col] == playerType && t.cell[row-2][col] == playerType)
+		isWin = (t.cell[2][0] == playerType && t.cell[2][2] == playerType || t.cell[1][1] == playerType && t.cell[0][1] == playerType)
 	} else if row == 1 && col == 2 {
-		isWin = (t.cell[row][col-1] == playerType && t.cell[row][col-2] == playerType || t.cell[row-1][col] == playerType && t.cell[row+1][col] == playerType)
-
+		isWin = (t.cell[1][1] == playerType && t.cell[1][0] == playerType || t.cell[0][2] == playerType && t.cell[2][2] == playerType)
 	}
 
 	return isWin
+}
+
+func (t *TicTacToe) setStrikeLine(row1, col1, row2, col2 int) {
+
+	var x1, y1 = t.board.GetXY(row1, col1)
+
+	var x2, y2 = t.board.GetXY(row2, col2)
+
+	if row1 == 0 && col1 == 0 && row2 == 0 && col2 == 2 {
+		//(0, 0, 0, 2)
+		x1 = x1 + t.board.cellsize/2
+		y1 = y1 + t.board.cellsize/4
+
+		x2 = x2 + t.board.cellsize/2
+		y2 = y2 + t.board.cellsize/2 + t.board.cellsize/4
+	} else if row1 == 0 && col1 == 0 && row2 == 2 && col2 == 0 {
+		//(0, 0, 2, 0)
+		x1 = x1 + t.board.cellsize/4
+		y1 = y1 + t.board.cellsize/2
+
+		x2 = x2 + t.board.cellsize/2 + t.board.cellsize/4
+		y2 = y2 + t.board.cellsize/2
+	} else if row1 == 0 && col1 == 0 && row2 == 2 && col2 == 2 {
+		//(0, 0, 2, 2)
+		x1 = x1 + t.board.cellsize/4
+		y1 = y1 + t.board.cellsize/4
+
+		x2 = x2 + t.board.cellsize/2 + t.board.cellsize/4
+		y2 = y2 + t.board.cellsize/2 + t.board.cellsize/4
+	} else if row1 == 1 && col1 == 0 && row2 == 1 && col2 == 2 {
+		//(1, 0, 1, 2)
+		x1 = x1 + t.board.cellsize/2
+		y1 = y1 + t.board.cellsize/4
+
+		x2 = x2 + t.board.cellsize/2
+		y2 = y2 + t.board.cellsize/2 + t.board.cellsize/4
+	} else if row1 == 2 && col1 == 0 && row2 == 2 && col2 == 2 {
+		//(2, 0, 2, 2)
+		x1 = x1 + t.board.cellsize/2
+		y1 = y1 + t.board.cellsize/4
+
+		x2 = x2 + t.board.cellsize/2
+		y2 = y2 + t.board.cellsize/2 + t.board.cellsize/4
+	} else if row1 == 2 && col1 == 0 && row2 == 0 && col2 == 2 {
+		//(2, 0, 0, 2)
+		x1 = x1 + t.board.cellsize/2 + t.board.cellsize/4
+		y1 = y1 + t.board.cellsize/4
+
+		x2 = x2 + t.board.cellsize/4
+		y2 = y2 + t.board.cellsize/2 + t.board.cellsize/4
+	} else if row1 == 0 && col1 == 1 && row2 == 2 && col2 == 1 {
+		//(0, 1, 2, 1)
+		x1 = x1 + t.board.cellsize/4
+		y1 = y1 + t.board.cellsize/2
+		x2 = x2 + t.board.cellsize/2 + t.board.cellsize/4
+		y2 = y2 + t.board.cellsize/2
+	} else if row1 == 0 && col1 == 2 && row2 == 2 && col2 == 2 {
+		//(0, 2, 2, 2)
+		x1 = x1 + t.board.cellsize/4
+		y1 = y1 + t.board.cellsize/2
+
+		x2 = x2 + t.board.cellsize/2 + t.board.cellsize/4
+		y2 = y2 + t.board.cellsize/2
+	}
+
+	t.s1 = image.Point{
+		X: x1,
+		Y: y1,
+	}
+
+	t.s2 = image.Point{
+		X: x2,
+		Y: y2,
+	}
 }
 
 func (t *TicTacToe) CheckGameOver() (bool, int) {
@@ -232,22 +309,43 @@ func (t *TicTacToe) CheckGameOver() (bool, int) {
 		if (t.cell[0][0] != 0) && (t.cell[0][0] == t.cell[0][1] && t.cell[0][1] == t.cell[0][2] || t.cell[0][0] == t.cell[1][0] && t.cell[1][0] == t.cell[2][0] || t.cell[0][0] == t.cell[1][1] && t.cell[1][1] == t.cell[2][2]) {
 			isGameOver = true
 			winner = t.cell[0][0]
+
+			if t.cell[0][0] == t.cell[0][1] && t.cell[0][1] == t.cell[0][2] {
+				t.setStrikeLine(0, 0, 0, 2) //
+			} else if t.cell[0][0] == t.cell[1][0] && t.cell[1][0] == t.cell[2][0] {
+				t.setStrikeLine(0, 0, 2, 0) //
+			} else if t.cell[0][0] == t.cell[1][1] && t.cell[1][1] == t.cell[2][2] {
+				t.setStrikeLine(0, 0, 2, 2) //
+			}
+
 		} else if (t.cell[1][0] != 0) && (t.cell[1][0] == t.cell[1][1] && t.cell[1][1] == t.cell[1][2]) {
 			isGameOver = true
 			winner = t.cell[1][0]
+			t.setStrikeLine(1, 0, 1, 2) //
+
 		} else if (t.cell[2][0] != 0) && (t.cell[2][0] == t.cell[2][1] && t.cell[2][1] == t.cell[2][2] || t.cell[2][0] == t.cell[1][1] && t.cell[1][1] == t.cell[0][2]) {
 			isGameOver = true
 			winner = t.cell[2][0]
+			if t.cell[2][0] == t.cell[2][1] && t.cell[2][1] == t.cell[2][2] {
+				t.setStrikeLine(2, 0, 2, 2) //
+			} else if t.cell[2][0] == t.cell[1][1] && t.cell[1][1] == t.cell[0][2] {
+				t.setStrikeLine(2, 0, 0, 2) //
+			}
+
 		} else if (t.cell[0][1] != 0) && (t.cell[0][1] == t.cell[1][1] && t.cell[1][1] == t.cell[2][1]) {
 			isGameOver = true
 			winner = t.cell[0][1]
+			t.setStrikeLine(0, 1, 2, 1) //
+
 		} else if (t.cell[0][2] != 0) && (t.cell[0][2] == t.cell[1][2] && t.cell[1][2] == t.cell[2][2]) {
 			isGameOver = true
 			winner = t.cell[0][2]
+			t.setStrikeLine(0, 2, 2, 2)
 		}
 
 		if !isGameOver && numMove == ((NUM_COL*NUM_ROW)-1) {
 			isGameOver = true
+			winner = GAME_TIDE
 		}
 
 	}
@@ -284,8 +382,11 @@ func (t *TicTacToe) Draw(screen *ebiten.Image) {
 		}
 	}
 
-	if !IsMobileBuild() && t.isGameover {
-		t.DrawGameOver(screen)
+	if t.isGameover {
+		vector.StrokeLine(screen, float32(t.s1.X), float32(t.s1.Y), float32(t.s2.X), float32(t.s2.Y), 5, color.Black, false)
+		if !IsMobileBuild() {
+			//t.DrawGameOver(screen)
+		}
 	}
 }
 
@@ -384,27 +485,32 @@ func (t *TicTacToe) Update(delta int64) {
 		}
 		row, col := t.GetAIMove(t.player.aiType)
 		if row > -1 && col > -1 {
-			t.numAIMove++
-			t.cell[row][col] = ANIMATE_AI_PLAYER
-			t.animRow = row
-			t.animCol = col
-			t.player.circleImgIdx = 0
-			t.state = STATE_ANIMATE_AI_PLAYER
+			if t.cell[row][col] == 0 {
+				t.numAIMove++
+				t.cell[row][col] = ANIMATE_AI_PLAYER
+				t.animRow = row
+				t.animCol = col
+				t.player.circleImgIdx = 0
+				t.state = STATE_ANIMATE_AI_PLAYER
+			}
 		}
 
 	case STATE_HUMAN_PLAYER_TURN:
 		t.CalculatePlayTime(delta)
+
 		mx, my := input.Current().GetPosition()
 		if mx >= 0 && my >= 0 {
 			row, col := t.board.GetSelectedCell(mx, my)
 			if row > -1 && col > -1 {
-				t.numHumanMove++
-				t.cell[row][col] = ANIMATE_HUMAN_PLAYER
-				t.animRow = row
-				t.animCol = col
-				t.player.crossImgIdx = 0
-				t.state = STATE_ANIMATE_HUMAN_PLAYER
-				t.showMsg = false
+				if t.cell[row][col] == 0 {
+					t.numHumanMove++
+					t.cell[row][col] = ANIMATE_HUMAN_PLAYER
+					t.animRow = row
+					t.animCol = col
+					t.player.crossImgIdx = 0
+					t.state = STATE_ANIMATE_HUMAN_PLAYER
+					t.showMsg = false
+				}
 			}
 		}
 
@@ -421,7 +527,7 @@ func (t *TicTacToe) Update(delta int64) {
 		if IsMobileBuild() && t.GameOverCallBack != nil {
 			t.GameOverCallBack(t.winner, t.playtime)
 		} else {
-			t.SetDelay(3 * SEC_IN_MILLIS)
+			t.SetDelay(5 * SEC_IN_MILLIS)
 		}
 		t.state = STATE_GAME_OVER_HALT
 
@@ -496,92 +602,95 @@ func (t *TicTacToe) GetSecondPlace(currow int, curcol int, playerType int) (int,
 	var col int = -1
 
 	if currow == 0 && curcol == 0 {
-		if t.cell[currow][curcol+1] == 0 && t.cell[currow][curcol+2] == 0 {
-			row = currow
-			col = curcol + 1
-		} else if t.cell[currow+1][curcol] == 0 && t.cell[currow+2][curcol] == 0 {
-			row = currow + 1
-			col = curcol
-		} else if t.cell[currow+1][curcol+1] == 0 && t.cell[currow+2][curcol+2] == 0 {
-			row = currow + 1
-			col = curcol + 1
+		if t.cell[0][1] == 0 && t.cell[0][2] == 0 {
+			row = 0
+			col = 1
+		} else if t.cell[1][0] == 0 && t.cell[2][0] == 0 {
+			row = 1
+			col = 0
+		} else if t.cell[1][1] == 0 && t.cell[2][2] == 0 {
+			row = 1
+			col = 1
 		}
 	} else if currow == 0 && curcol == 2 {
-		if t.cell[currow][curcol-1] == 0 && t.cell[currow][curcol-2] == 0 {
-			row = currow
-			col = curcol - 1
-		} else if t.cell[currow+1][curcol] == 0 && t.cell[currow+2][curcol] == 0 {
-			row = currow + 1
-			col = curcol
-		} else if t.cell[currow+1][curcol-1] == 0 && t.cell[currow+2][curcol-2] == 0 {
-			row = currow + 1
-			col = curcol - 1
+		if t.cell[0][1] == 0 && t.cell[0][0] == 0 {
+			row = 0
+			col = 1
+		} else if t.cell[1][2] == 0 && t.cell[2][2] == 0 {
+			row = 1
+			col = 2
+		} else if t.cell[1][1] == 0 && t.cell[2][0] == 0 {
+			row = 1
+			col = 1
 		}
 	} else if currow == 2 && curcol == 0 {
-		if t.cell[currow][curcol+1] == 0 && t.cell[currow][curcol+2] == 0 {
-			row = currow
-			col = curcol + 1
-		} else if t.cell[currow-1][curcol] == 0 && t.cell[currow-2][curcol] == 0 {
-			row = currow - 1
-			col = curcol
-		} else if t.cell[currow-1][curcol+1] == 0 && t.cell[currow-2][curcol+2] == 0 {
-			row = currow - 1
-			col = curcol + 1
+		if t.cell[2][1] == 0 && t.cell[2][2] == 0 {
+			row = 2
+			col = 1
+		} else if t.cell[1][0] == 0 && t.cell[0][0] == 0 {
+			row = 1
+			col = 0
+		} else if t.cell[1][1] == 0 && t.cell[0][2] == 0 {
+			row = 1
+			col = 1
 		}
 	} else if currow == 2 && curcol == 2 {
-		if t.cell[currow][curcol-1] == 0 && t.cell[currow][curcol-2] == 0 {
-			row = currow
-			col = curcol - 1
-		} else if t.cell[currow-1][curcol] == 0 && t.cell[currow-2][curcol] == 0 {
-			row = currow - 1
-			col = curcol
-		} else if t.cell[currow-1][curcol-1] == 0 && t.cell[currow-2][curcol-2] == 0 {
-			row = currow - 1
-			col = curcol - 1
+		if t.cell[2][1] == 0 && t.cell[2][0] == 0 {
+			row = 2
+			col = 1
+		} else if t.cell[1][2] == 0 && t.cell[0][2] == 0 {
+			row = 1
+			col = 2
+		} else if t.cell[1][1] == 0 && t.cell[0][0] == 0 {
+			row = 1
+			col = 1
 		}
 	} else if currow == 1 && curcol == 1 {
-		if t.cell[currow][curcol-1] == 0 && t.cell[currow][curcol+1] == 0 {
-			row = currow
-			col = curcol - 1
-		} else if t.cell[currow-1][curcol] == 0 && t.cell[currow+1][curcol] == 0 {
-			row = currow - 1
-			col = curcol
-		} else if t.cell[currow-1][curcol-1] == 0 && t.cell[currow+1][curcol+1] == 0 {
-			row = currow - 1
-			col = curcol - 1
+		if t.cell[1][0] == 0 && t.cell[1][2] == 0 {
+			row = 1
+			col = 0
+		} else if t.cell[0][1] == 0 && t.cell[2][1] == 0 {
+			row = 0
+			col = 1
+		} else if t.cell[0][0] == 0 && t.cell[2][2] == 0 {
+			row = 0
+			col = 0
+		} else if t.cell[2][0] == 0 && t.cell[0][2] == 0 {
+			row = 2
+			col = 0
 		}
 	} else if currow == 0 && curcol == 1 {
-		if t.cell[currow][curcol-1] == 0 && t.cell[currow][curcol+1] == 0 {
-			row = currow
-			col = curcol - 1
-		} else if t.cell[currow+1][curcol] == 0 && t.cell[currow+2][curcol] == 0 {
-			row = currow + 1
-			col = curcol
+		if t.cell[0][0] == 0 && t.cell[0][2] == 0 {
+			row = 0
+			col = 0
+		} else if t.cell[1][1] == 0 && t.cell[2][1] == 0 {
+			row = 1
+			col = 1
 		}
 
 	} else if currow == 1 && curcol == 0 {
-		if t.cell[currow][curcol+1] == 0 && t.cell[currow][curcol+2] == 0 {
-			row = currow
-			col = curcol + 1
-		} else if t.cell[currow-1][curcol] == 0 && t.cell[currow-1][curcol] == 0 {
-			row = currow - 1
-			col = curcol
+		if t.cell[1][1] == 0 && t.cell[1][2] == 0 {
+			row = 1
+			col = 1
+		} else if t.cell[0][0] == 0 && t.cell[2][0] == 0 {
+			row = 0
+			col = 0
 		}
 	} else if currow == 2 && curcol == 1 {
-		if t.cell[currow][curcol-1] == 0 && t.cell[currow][curcol+1] == 0 {
-			row = currow
-			col = curcol - 1
-		} else if t.cell[currow-1][curcol] == 0 && t.cell[currow-2][curcol] == 0 {
-			row = currow - 1
-			col = curcol
+		if t.cell[2][0] == 0 && t.cell[2][2] == 0 {
+			row = 2
+			col = 0
+		} else if t.cell[1][1] == 0 && t.cell[0][1] == 0 {
+			row = 1
+			col = 1
 		}
 	} else if currow == 1 && curcol == 2 {
-		if t.cell[currow][curcol-1] == 0 && t.cell[currow][curcol-2] == 0 {
-			row = currow
-			col = curcol - 1
-		} else if t.cell[currow-1][curcol] == 0 && t.cell[currow+1][curcol] == 0 {
-			row = currow - 1
-			col = curcol
+		if t.cell[1][1] == 0 && t.cell[1][0] == 0 {
+			row = 1
+			col = 1
+		} else if t.cell[0][2] == 0 && t.cell[2][2] == 0 {
+			row = 0
+			col = 2
 		}
 	}
 	return row, col

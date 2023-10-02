@@ -52,8 +52,8 @@ func (b *Board) GetXY(row, col int) (int, int) {
 
 	var x, y int = 0, 0
 
-	x = b.x + (row * b.cellwithmargine) + b.cellsize/2
-	y = b.y + (col * b.cellwithmargine) + b.cellsize/2
+	x = b.x + (row * b.cellwithmargine)
+	y = b.y + (col * b.cellwithmargine)
 
 	return x, y
 
