@@ -73,11 +73,15 @@ func (app *App) SetState(state int) {
 }
 
 func (app *App) Pause() {
-	app.SetState(APP_STATE_PAUSED)
+	if app.state != APP_STATE_PAUSED {
+		app.SetState(APP_STATE_PAUSED)
+	}
 }
 
 func (app *App) Resume() {
-	app.SetState(app.prevState)
+	if app.state == APP_STATE_PAUSED {
+		app.SetState(app.prevState)
+	}
 }
 
 func (app *App) Draw(screen *ebiten.Image) {

@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">GoTicTacToe</string>
+    <string name="new_game">New Game</string>
+    <string name="score">Score</string>
+    <string name="about">About</string>
 
 </resources>

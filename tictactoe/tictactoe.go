@@ -383,9 +383,11 @@ func (t *TicTacToe) Draw(screen *ebiten.Image) {
 	}
 
 	if t.isGameover {
-		vector.StrokeLine(screen, float32(t.s1.X), float32(t.s1.Y), float32(t.s2.X), float32(t.s2.Y), 5, color.Black, false)
+		if t.winner != GAME_TIDE {
+			vector.StrokeLine(screen, float32(t.s1.X), float32(t.s1.Y), float32(t.s2.X), float32(t.s2.Y), 5, color.Black, false)
+		}
 		if !IsMobileBuild() {
-			//t.DrawGameOver(screen)
+			t.DrawGameOver(screen)
 		}
 	}
 }

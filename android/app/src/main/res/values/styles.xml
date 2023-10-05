@@ -26,4 +26,9 @@
         <item name="cornerFamily">cut</item>
         <item name="cornerSize">8dp</item>
     </style>
+
+    <style name="AlertDialogGameover" parent="ThemeOverlay.App.MaterialAlertDialog">
+        <item name="materialAlertDialogBodyTextStyle">@style/MaterialAlertDialog.App.Body.Text</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/MaterialAlertDialog.App.Title.Text</item>
+    </style>
 </resources>
