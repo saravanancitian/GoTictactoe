@@ -58,7 +58,7 @@ func (app *App) Update() error {
 		app.prevTime = app.curTime
 		app.ttt.Update(delta)
 	case APP_STATE_PAUSED:
-		app.prevTime = app.curTime
+		app.prevTime = time.Now().UnixMilli()
 		app.curTime = time.Now().UnixMilli()
 	}
 
@@ -74,12 +74,15 @@ func (app *App) SetState(state int) {
 
 func (app *App) Pause() {
 	if app.state != APP_STATE_PAUSED {
+
 		app.SetState(APP_STATE_PAUSED)
 	}
 }
 
 func (app *App) Resume() {
 	if app.state == APP_STATE_PAUSED {
+		app.prevTime = time.Now().UnixMilli()
+		app.curTime = time.Now().UnixMilli()
 		app.SetState(app.prevState)
 	}
 }

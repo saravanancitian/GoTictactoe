@@ -57,6 +57,8 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
 
      WebView scoretxtview;
 
+    EbitenView ebitenView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
         createAboutDialog();
         createScoreDialog();
         createResetAlertDialog();
+        ebitenView =getEbitenView();
     }
 
     private void loadScore(){
@@ -240,9 +243,8 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
             adView.pause();
         }
         saveScore();
-        this.getEbitenView().suspendGame();
+        pauseGame();
         super.onPause();
-        //Mobile.resume();
     }
 
     @Override
@@ -251,9 +253,7 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
         if (adView != null) {
             adView.resume();
         }
-        this.getEbitenView().resumeGame();
-        //Mobile.pause();
-
+        resumeGame();
     }
 
     @Override
@@ -262,6 +262,17 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
             adView.destroy();
         }
         super.onDestroy();
+    }
+    
+    void pauseGame(){
+        Mobile.pause();
+        this.ebitenView.suspendGame();
+    }
+    
+    void resumeGame(){
+
+        Mobile.resume();
+        this.ebitenView.resumeGame();
     }
 
     void showScore(){
