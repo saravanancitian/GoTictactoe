@@ -18,7 +18,8 @@
         ads:adUnitId="ca-app-pub-3940256099942544/6300978111"
         >
     </com.google.android.gms.ads.AdView>
-    <!-- test:   ads:adUnitId="ca-app-pub-3940256099942544/6300978111"-->
+    <!-- test: ads:adUnitId="ca-app-pub-3940256099942544/6300978111"-->
+    <!-- prod: ads:adUnitId="ca-app-pub-4174135424487607/1661606072" -->
 
     <com.samaya.gotictactoe.EbitenViewWithErrorHandling
         android:id="@+id/ebitenview"
