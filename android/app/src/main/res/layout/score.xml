@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="15dp">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <com.google.android.material.textview.MaterialTextView
+        android:text="Played:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+    </com.google.android.material.textview.MaterialTextView>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/totalPlayed"
+        android:text=""
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+    </com.google.android.material.textview.MaterialTextView>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:text="Win:"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/totalWin"
+            android:text=""
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+        </TextView>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:text="Tied:"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/totalTied"
+            android:text=""
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+        </TextView>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="5dp">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Top 3 Score"/>
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/border">
+        <TableRow
+            android:layout_width="match_parent"
+            android:weightSum="2">
+
+            <TextView
+                android:text="Date"
+
+                android:gravity="center_horizontal"
+                android:padding="3dip"
+                android:textStyle="bold"
+                android:background="@drawable/border"
+                android:layout_weight="1"/>
+            <TextView
+                android:gravity="center_horizontal"
+                android:text="Duration"
+                android:padding="3dip"
+                android:background="@drawable/border"
+                android:textStyle="bold"
+                android:layout_weight="1"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:weightSum="2">
+            <TextView
+                android:id="@+id/date1"
+                android:text="Date"
+                android:gravity="center_horizontal"
+                android:padding="3dip"
+                android:background="@drawable/border"
+                android:layout_weight="1"/>
+            <TextView
+                android:id="@+id/tp1"
+                android:text="Duration"
+                android:gravity="center_horizontal"
+                android:padding="3dip"
+                android:background="@drawable/border"
+                android:layout_weight="1"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:weightSum="2">
+            <TextView
+                android:id="@+id/date2"
+                android:text="Date"
+                android:gravity="center_horizontal"
+                android:padding="3dip"
+                android:background="@drawable/border"
+                android:layout_weight="1"/>
+            <TextView
+                android:id="@+id/tp2"
+                android:text="Duration"
+                android:gravity="center_horizontal"
+                android:padding="3dip"
+                android:background="@drawable/border"
+                android:layout_weight="1"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:weightSum="2">
+            <TextView
+                android:id="@+id/date3"
+                android:text="Date"
+                android:gravity="center_horizontal"
+                android:padding="3dip"
+                android:background="@drawable/border"
+                android:layout_weight="1"/>
+            <TextView
+                android:id="@+id/tp3"
+                android:text="Duration"
+                android:gravity="center_horizontal"
+                android:padding="3dip"
+                android:background="@drawable/border"
+                android:layout_weight="1"/>
+        </TableRow>
+    </TableLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+</androidx.appcompat.widget.LinearLayoutCompat>

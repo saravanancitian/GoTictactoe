@@ -5,13 +5,38 @@ import java.util.Date;
 
 
 public class Score  implements java.io.Serializable{
-    private static final long SEC_IN_MILLIS = 1000;
+    public static final long SEC_IN_MILLIS = 1000;
     private int totalPlayed;
     private int totalWin;
     private int totalTied;
 
     long date1;
     long date2;
+
+    public long getDate1() {
+        return date1;
+    }
+
+    public long getDate2() {
+        return date2;
+    }
+
+    public long getDate3() {
+        return date3;
+    }
+
+    public long getTopPlayedTime1() {
+        return topPlayedTime1;
+    }
+
+    public long getTopPlayedTime2() {
+        return topPlayedTime2;
+    }
+
+    public long getTopPlayedTime3() {
+        return topPlayedTime3;
+    }
+
     long date3;
     long topPlayedTime1;
     long topPlayedTime2;
@@ -44,19 +69,22 @@ public class Score  implements java.io.Serializable{
     }
 
     private void addTopTime(long curPlayedTime){
-        if (curPlayedTime >= topPlayedTime1){
+
+        if(topPlayedTime1 == 0){
+            topPlayedTime1 = curPlayedTime;
+        } else if(curPlayedTime <= topPlayedTime1) {
             topPlayedTime3 = topPlayedTime2;
             date3 = date2;
             topPlayedTime2 = topPlayedTime1;
             date2 = date1;
             topPlayedTime1 = curPlayedTime;
             date1 = System.currentTimeMillis();
-        } else if (curPlayedTime >= topPlayedTime2){
+        } else if (curPlayedTime <= topPlayedTime2){
             topPlayedTime3 = topPlayedTime2;
             date3 = date2;
             topPlayedTime2 = curPlayedTime;
             date2 = System.currentTimeMillis();
-        } else if(curPlayedTime >= topPlayedTime3){
+        } else if (curPlayedTime <= topPlayedTime3){
             topPlayedTime3 = curPlayedTime;
             date3 = System.currentTimeMillis();
         }

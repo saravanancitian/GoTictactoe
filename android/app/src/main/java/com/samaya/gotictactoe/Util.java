@@ -3,6 +3,7 @@ package com.samaya.gotictactoe;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 
 public class Util {
 
@@ -20,5 +21,21 @@ public class Util {
             baos.close();
         }
         return retval;
+    }
+
+
+    public static String formatDate(Date date){
+        String retval = "";
+        if(date != null){
+            retval = String.format("%td %tb %tY", date, date, date);
+        }
+        return  retval;
+    }
+
+    public static String formatTime(long duration){
+        long hour = duration / 60;
+        long min = duration % 60;
+
+        return String.format("%d : %d", hour, min);
     }
 }

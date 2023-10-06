@@ -32,12 +32,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Date;
 
 import go.Seq;
 
 public class MainActivity extends AppCompatActivity implements IGameCallback {
 
     public static final String SCOREFILE = "score.dat";
+    public static final String ABOUTFILE = "about.html";
     public static final int HUMAN_PLAYER  = 1;
     public static final int AI_PLAYER = -1;
     public static final int GAME_TIED = 0;
@@ -46,17 +48,17 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
 
     private  AlertDialog aboutDialog;
     private  AlertDialog resetAlertDialog;
-
     private AlertDialog scoreDialog;
+
+    private AlertDialog gameOverDialog;
 
     private  Score score;
     AssetManager assetManager;
 
-    String scoreString = "";
     String aboutString = "";
 
-     WebView scoretxtview;
-
+    View scoreview;
+    MaterialTextView txtGameOver;
     EbitenView ebitenView;
 
     @Override
@@ -76,11 +78,11 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
         }
 
         adView.loadAd(adRequest);
-        scoreString = readAssetFile("score.html");
-        aboutString = readAssetFile("about.html");
+        aboutString = readAssetFile(ABOUTFILE);
         createAboutDialog();
         createScoreDialog();
         createResetAlertDialog();
+        createGameOverDialog();
         ebitenView =getEbitenView();
     }
 
@@ -141,7 +143,6 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
                 }
             }
         }
-
     }
 
     String readAssetFile(String filename){
@@ -169,55 +170,46 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
 
     void createResetAlertDialog(){
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        builder.setMessage("Resetting the score cannot be undone. Do you wish to reset");
-        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                score.reset();
-            }
-        });
-        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
+        builder.setMessage(R.string.reset_alert_text);
+        builder.setPositiveButton(R.string.btn_yes, (dialog, which) -> score.reset());
+        builder.setNegativeButton(R.string.btn_no, (dialog, which) -> dialog.cancel());
         resetAlertDialog = builder.create();
     }
 
-    void createScoreDialog(){
-        scoretxtview = new WebView(this);
+    void createGameOverDialog(){
 
+        View gameoverView = getLayoutInflater().inflate(R.layout.game_over, null, false);
+
+        txtGameOver = gameoverView.findViewById(R.id.txt_gameover);
+
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(MainActivity.this);
+        builder.setTitle(R.string.game_over);
+        builder.setView(gameoverView);
+        builder.setPositiveButton(R.string.btn_play_again, (dialog, id) -> Mobile.playAgain());
+        builder.setNegativeButton(R.string.btn_exit, (dialog, id) -> finish());
+        builder.setNeutralButton(R.string.btn_view_board, (dialog, which) -> dialog.cancel());
+
+        gameOverDialog = builder.create();
+    }
+
+    void createScoreDialog(){
+
+        scoreview = getLayoutInflater().inflate(R.layout.score,null, false);
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 
-        builder.setView(scoretxtview);
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        builder.setNeutralButton("Reset", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                resetAlertDialog.show();
-
-            }
-        });
+        builder.setView(scoreview);
+        builder.setNegativeButton(R.string.btn_cancel, (dialog, which) -> dialog.dismiss());
+        builder.setNeutralButton(R.string.btn_reset, (dialog, which) -> resetAlertDialog.show());
         scoreDialog = builder.create();
     }
 
     void createAboutDialog(){
-        WebView wv = new WebView(this);
+        View aboutView = getLayoutInflater().inflate(R.layout.about, null, false);
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        builder.setView(wv);
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        wv.loadUrl("file:///android_asset/about.html");
+        builder.setView(aboutView);
+        builder.setNegativeButton(R.string.btn_cancel, (dialog, which) -> dialog.dismiss());
+        MaterialTextView txt_about = aboutView.findViewById(R.id.txt_about);
+        txt_about.setText(Html.fromHtml(aboutString));
         aboutDialog = builder.create();
     }
 
@@ -276,9 +268,40 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
     }
 
     void showScore(){
-        String scoretxt = score.formattedString( scoreString);
+        MaterialTextView txtTotalplayed = scoreview.findViewById(R.id.totalPlayed);
+        txtTotalplayed.setText(String.valueOf(score.getTotalPlayed()));
 
-        scoretxtview.loadData(scoretxt, "text/html; charset=UTF-8", null);
+        MaterialTextView txtTotalWin = scoreview.findViewById(R.id.totalWin);
+        txtTotalWin.setText(String.valueOf(score.getTotalWin()));
+
+        MaterialTextView txtTotalTied = scoreview.findViewById(R.id.totalTied);
+        txtTotalTied.setText(String.valueOf(score.getTotalTied()));
+
+        Date dt1 = score.getDate1() > 0? new Date( score.getDate1() ): null;
+        long dur1 =  score.getTopPlayedTime1() > 0? score.getTopPlayedTime1()/Score.SEC_IN_MILLIS : 0;
+        Date dt2 =  score.getDate2() > 0? new Date(score.getDate2()) : null;
+        long dur2 = score.getTopPlayedTime2() > 0? score.getTopPlayedTime2()/Score.SEC_IN_MILLIS : 0;
+        Date dt3 =  score.getDate3() > 0?new Date(score.getDate3()) :  null;
+        long dur3 =  score.getTopPlayedTime3() > 0? score.getTopPlayedTime3()/Score.SEC_IN_MILLIS : 0;
+
+
+        MaterialTextView t1 = scoreview.findViewById(R.id.tp1);
+        t1.setText(Util.formatTime(dur1));
+
+        MaterialTextView d1 = scoreview.findViewById(R.id.date1);
+        d1.setText(Util.formatDate(dt1));
+
+        MaterialTextView t2 = scoreview.findViewById(R.id.tp2);
+        t2.setText(Util.formatTime(dur2));
+
+        MaterialTextView d2 = scoreview.findViewById(R.id.date2);
+        d2.setText(Util.formatDate(dt2));
+
+        MaterialTextView t3 = scoreview.findViewById(R.id.tp3);
+        t3.setText(Util.formatTime(dur3));
+
+        MaterialTextView d3 = scoreview.findViewById(R.id.date3);
+        d3.setText(Util.formatDate(dt3));
 
         scoreDialog.show();
     }
@@ -304,34 +327,11 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
     public void gameOverCallBack(long winner, long duration) {
         score.addPlayed((int)winner, duration);
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                String message  =  winner == HUMAN_PLAYER? "You Win" : winner == AI_PLAYER ? "You Lose" : "Tide the Game";
+        runOnUiThread(() -> {
+            String message  = getString( winner == HUMAN_PLAYER? R.string.you_win : winner == AI_PLAYER ? R.string.you_lose : R.string.tied_game);
+            txtGameOver.setText(message);
+            gameOverDialog.show();
 
-                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(MainActivity.this, R.style.AlertDialogGameover);
-                builder.setMessage(message).setTitle("Game Over");
-
-                builder.setPositiveButton("Play Again", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        Mobile.playAgain();
-                    }
-                });
-                builder.setNegativeButton("Exit", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        finish();
-                    }
-                });
-                builder.setNeutralButton("View Board", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-
-                AlertDialog dialog = builder.create();
-                dialog.show();
-            }
         });
     }
 }

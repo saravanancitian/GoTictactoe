@@ -3,5 +3,16 @@
     <string name="new_game">New Game</string>
     <string name="score">Score</string>
     <string name="about">About</string>
-
+    <string name="reset_alert_text">Resetting the score cannot be undone. Do you wish to reset</string>
+    <string name="btn_yes">Yes</string>
+    <string name="btn_no">No</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_reset">Reset</string>
+    <string name="you_win">You Win</string>
+    <string name="you_lose">You Lose</string>
+    <string name="tied_game">Tied the Game</string>
+    <string name="game_over">Game Over</string>
+    <string name="btn_play_again">Play Again</string>
+    <string name="btn_exit">Exit</string>
+    <string name="btn_view_board">View Board</string>
 </resources>
