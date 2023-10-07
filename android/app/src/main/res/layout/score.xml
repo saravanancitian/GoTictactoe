@@ -7,85 +7,107 @@
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2">
     <com.google.android.material.textview.MaterialTextView
-        android:text="Played:"
+        android:text="@string/played"
+        android:textStyle="bold"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
-    </com.google.android.material.textview.MaterialTextView>
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_weight="1"/>
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/totalPlayed"
+        android:textStyle="bold"
         android:text=""
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
-    </com.google.android.material.textview.MaterialTextView>
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_weight="1" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:text="Win:"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2">
+        <com.google.android.material.textview.MaterialTextView
+            android:text="@string/win"
+            android:textStyle="bold"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-        </TextView>
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/totalWin"
             android:text=""
+            android:textStyle="bold"
+            android:layout_gravity="center"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-        </TextView>
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:text="Tied:"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2">
+        <com.google.android.material.textview.MaterialTextView
+            android:text="@string/tied"
+            android:textStyle="bold"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-        </TextView>
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/totalTied"
+            android:textStyle="bold"
             android:text=""
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-        </TextView>
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1" />
+
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:layout_gravity="center"
         android:padding="5dp">
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Top 3 Score"/>
+        android:textStyle="bold"
+        android:layout_gravity="center"
+        android:text="@string/top_3_score"/>
 
     <TableLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/border">
+        android:background="@drawable/border"
+        android:padding="10dp">
         <TableRow
             android:layout_width="match_parent"
             android:weightSum="2">
 
-            <TextView
-                android:text="Date"
-
+            <com.google.android.material.textview.MaterialTextView
+                android:text="@string/date"
                 android:gravity="center_horizontal"
                 android:padding="3dip"
                 android:textStyle="bold"
                 android:background="@drawable/border"
                 android:layout_weight="1"/>
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:gravity="center_horizontal"
-                android:text="Duration"
+                android:text="@string/duration"
                 android:padding="3dip"
                 android:background="@drawable/border"
                 android:textStyle="bold"
@@ -95,16 +117,16 @@
         <TableRow
             android:layout_width="match_parent"
             android:weightSum="2">
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/date1"
-                android:text="Date"
+                android:text=""
                 android:gravity="center_horizontal"
                 android:padding="3dip"
                 android:background="@drawable/border"
                 android:layout_weight="1"/>
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/tp1"
-                android:text="Duration"
+                android:text=""
                 android:gravity="center_horizontal"
                 android:padding="3dip"
                 android:background="@drawable/border"
@@ -114,16 +136,16 @@
         <TableRow
             android:layout_width="match_parent"
             android:weightSum="2">
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/date2"
-                android:text="Date"
+                android:text=""
                 android:gravity="center_horizontal"
                 android:padding="3dip"
                 android:background="@drawable/border"
                 android:layout_weight="1"/>
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/tp2"
-                android:text="Duration"
+                android:text=""
                 android:gravity="center_horizontal"
                 android:padding="3dip"
                 android:background="@drawable/border"
@@ -133,16 +155,16 @@
         <TableRow
             android:layout_width="match_parent"
             android:weightSum="2">
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/date3"
-                android:text="Date"
+                android:text=""
                 android:gravity="center_horizontal"
                 android:padding="3dip"
                 android:background="@drawable/border"
                 android:layout_weight="1"/>
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/tp3"
-                android:text="Duration"
+                android:text=""
                 android:gravity="center_horizontal"
                 android:padding="3dip"
                 android:background="@drawable/border"

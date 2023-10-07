@@ -1,9 +1,5 @@
 package com.samaya.gotictactoe;
 
-import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-
-import android.content.DialogInterface;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.text.Html;
@@ -11,7 +7,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.WebView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,13 +15,14 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textview.MaterialTextView;
+import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.tictactoe.tictactoe.mobile.EbitenView;
 import com.tictactoe.tictactoe.mobile.IGameCallback;
 import com.tictactoe.tictactoe.mobile.Mobile;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,8 +34,8 @@ import go.Seq;
 
 public class MainActivity extends AppCompatActivity implements IGameCallback {
 
-    public static final String SCOREFILE = "score.dat";
-    public static final String ABOUTFILE = "about.html";
+    public static final String SCORE_FILE = "score.dat";
+    public static final String ABOUT_FILE = "about.html";
     public static final int HUMAN_PLAYER  = 1;
     public static final int AI_PLAYER = -1;
     public static final int GAME_TIED = 0;
@@ -61,16 +57,30 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
     MaterialTextView txtGameOver;
     EbitenView ebitenView;
 
+
+    public FirebaseAnalytics getmFirebaseAnalytics() {
+        return mFirebaseAnalytics;
+    }
+
+    public FirebaseCrashlytics getCrashlytics() {
+        return crashlytics;
+    }
+
+    private FirebaseAnalytics mFirebaseAnalytics;
+    private FirebaseCrashlytics crashlytics;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         assetManager = getAssets();
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        crashlytics = FirebaseCrashlytics.getInstance();
         setContentView(R.layout.activity_main);
         Seq.setContext(getApplicationContext());
         Mobile.registerGameCallback(this);
         adView = findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
-        File file = new File(getFilesDir(), SCOREFILE);
+        File file = new File(getFilesDir(), SCORE_FILE);
         if(file.exists()){
             loadScore();
         } else {
@@ -78,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
         }
 
         adView.loadAd(adRequest);
-        aboutString = readAssetFile(ABOUTFILE);
+        aboutString = readAssetFile(ABOUT_FILE);
         createAboutDialog();
         createScoreDialog();
         createResetAlertDialog();
@@ -90,12 +100,17 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
         FileInputStream fis  = null;
         ObjectInputStream ois = null;
        try{
-           fis = openFileInput(SCOREFILE);
+           fis = openFileInput(SCORE_FILE);
            ois = new ObjectInputStream(fis);
            score = (Score) ois.readObject();
 
        } catch (IOException | ClassNotFoundException e) {
            Log.e("Load Score", e.getMessage());
+           crashlytics.recordException(e);
+
+           score = Score.getInstance();
+
+
        } finally {
            if(ois != null){
                try {
@@ -119,15 +134,14 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
         FileOutputStream fos = null;
         ObjectOutputStream oos = null;
         try {
-            fos = openFileOutput(SCOREFILE, MODE_PRIVATE);
+            fos = openFileOutput(SCORE_FILE, MODE_PRIVATE);
             oos = new ObjectOutputStream(fos);
             oos.writeObject(score);
-        } catch (FileNotFoundException e) {
-            Log.e("SAVE SCORE", e.getMessage());
         } catch (IOException e) {
             Log.e("SAVE SCORE", e.getMessage());
-        }
-        finally {
+            crashlytics.recordException(e);
+
+        } finally {
             if(oos != null){
                 try {
                     oos.close();
@@ -313,9 +327,20 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
             Mobile.playAgain();
             return  true;
         } else if(item.getItemId() == R.id.score){
+            Bundle bundle = new Bundle();
+            bundle.putString(FirebaseAnalytics.Param.SCREEN_NAME, "Score Dialog");
+            bundle.putString(FirebaseAnalytics.Param.SCREEN_CLASS, "MainActivity");
+            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle);
+
             showScore();
             return true;
         } else if(item.getItemId() == R.id.about) {
+
+            Bundle bundle = new Bundle();
+            bundle.putString(FirebaseAnalytics.Param.SCREEN_NAME, "About Dialog");
+            bundle.putString(FirebaseAnalytics.Param.SCREEN_CLASS, "MainActivity");
+            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle);
+
             aboutDialog.show();
             return true;
         }

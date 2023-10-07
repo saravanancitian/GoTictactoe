@@ -15,4 +15,10 @@
     <string name="btn_play_again">Play Again</string>
     <string name="btn_exit">Exit</string>
     <string name="btn_view_board">View Board</string>
+    <string name="played">Played:</string>
+    <string name="win">Win:</string>
+    <string name="tied">Tied:</string>
+    <string name="top_3_score">Top 3 Score</string>
+    <string name="date">Date</string>
+    <string name="duration">Duration</string>
 </resources>

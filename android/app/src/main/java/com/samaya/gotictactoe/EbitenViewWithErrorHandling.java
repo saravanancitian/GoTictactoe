@@ -18,6 +18,8 @@ public class EbitenViewWithErrorHandling extends EbitenView {
     protected void onErrorOnGameUpdate(Exception e) {
         // You can define your own error handling e.g., using Crashlytics.
         // e.g., Crashlytics.logException(e);
+        ((MainActivity)getContext()).getCrashlytics().recordException(e);
+        
         super.onErrorOnGameUpdate(e);
     }
 }
