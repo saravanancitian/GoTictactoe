@@ -353,10 +353,14 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
         score.addPlayed((int)winner, duration);
 
         runOnUiThread(() -> {
-            String message  = getString( winner == HUMAN_PLAYER? R.string.you_win : winner == AI_PLAYER ? R.string.you_lose : R.string.tied_game);
-            txtGameOver.setText(message);
-            gameOverDialog.show();
-
+            try {
+                String message  = getString( winner == HUMAN_PLAYER? R.string.you_win : winner == AI_PLAYER ? R.string.you_lose : R.string.tied_game);
+                txtGameOver.setText(message);
+                gameOverDialog.show();
+            } catch (Exception e){
+                Log.e("GameOverCallback -runOnUIThread ", e.getMessage());
+                MainActivity.this.crashlytics.recordException(e);
+            }
         });
     }
 }
