@@ -27,6 +27,18 @@ const (
 )
 
 const (
+	TURN1 int = iota
+	TURN2
+	TURN3
+	TURN4
+	TURN5
+	TURN6
+	TURN7
+	TURN8
+	TURN9
+)
+
+const (
 	HUMAN_PLAYER int = 1
 	AI_PLAYER    int = -1
 
@@ -198,33 +210,6 @@ func (t *TicTacToe) CalculatePlayTime(delta int64) {
 			t.playtimecalc += delta
 		}
 	}
-}
-
-func (t *TicTacToe) CanPlayerWin(row int, col int, playerType int) bool {
-	var isWin bool = false
-
-	if row == 0 && col == 0 {
-		//check col, row, dia
-		isWin = (t.cell[1][0] == playerType && t.cell[2][0] == playerType || t.cell[0][1] == playerType && t.cell[0][2] == playerType || t.cell[1][1] == playerType && t.cell[2][2] == playerType)
-	} else if row == 0 && col == 2 {
-		isWin = (t.cell[1][2] == playerType && t.cell[2][2] == playerType || t.cell[0][1] == playerType && t.cell[0][0] == playerType || t.cell[1][1] == playerType && t.cell[2][0] == playerType)
-	} else if row == 2 && col == 0 {
-		isWin = (t.cell[1][0] == playerType && t.cell[0][0] == playerType || t.cell[2][1] == playerType && t.cell[2][2] == playerType || t.cell[1][1] == playerType && t.cell[0][2] == playerType)
-	} else if row == 2 && col == 2 {
-		isWin = (t.cell[1][2] == playerType && t.cell[0][2] == playerType || t.cell[2][1] == playerType && t.cell[2][0] == playerType || t.cell[1][1] == playerType && t.cell[0][0] == playerType)
-	} else if row == 1 && col == 1 {
-		isWin = (t.cell[0][1] == playerType && t.cell[2][1] == playerType || t.cell[1][0] == playerType && t.cell[1][2] == playerType || t.cell[0][0] == playerType && t.cell[2][2] == playerType || t.cell[2][0] == playerType && t.cell[0][2] == playerType)
-	} else if row == 0 && col == 1 {
-		isWin = (t.cell[0][0] == playerType && t.cell[0][2] == playerType || t.cell[1][1] == playerType && t.cell[2][1] == playerType)
-	} else if row == 1 && col == 0 {
-		isWin = (t.cell[1][1] == playerType && t.cell[1][2] == playerType || t.cell[0][0] == playerType && t.cell[2][0] == playerType)
-	} else if row == 2 && col == 1 {
-		isWin = (t.cell[2][0] == playerType && t.cell[2][2] == playerType || t.cell[1][1] == playerType && t.cell[0][1] == playerType)
-	} else if row == 1 && col == 2 {
-		isWin = (t.cell[1][1] == playerType && t.cell[1][0] == playerType || t.cell[0][2] == playerType && t.cell[2][2] == playerType)
-	}
-
-	return isWin
 }
 
 func (t *TicTacToe) setStrikeLine(row1, col1, row2, col2 int) {
@@ -438,8 +423,8 @@ func (t *TicTacToe) SetStartTurn() {
 		t.player.aiType = AI_TYPE_AVERAGE
 
 		if t.toggleRand {
-			var aitypes = []int{AI_TYPE_AVERAGE, AI_TYPE_BELOW_AVERAGE}
-			t.player.aiType = aitypes[t.random.Intn(2)]
+			var aitypes = []int{AI_TYPE_BELOW_AVERAGE, AI_TYPE_AVERAGE, AI_TYPE_GOOD}
+			t.player.aiType = aitypes[t.random.Intn(3)]
 		}
 		t.toggleRand = !t.toggleRand
 
@@ -482,8 +467,8 @@ func (t *TicTacToe) Update(delta int64) {
 		t.CalculatePlayTime(delta)
 
 		if t.player.aiType == AI_TYPE_BELOW_AVERAGE && t.numAIMove > 2 {
-			var aitypes = []int{AI_TYPE_AVERAGE, AI_TYPE_BELOW_AVERAGE}
-			t.player.aiType = aitypes[t.random.Intn(2)]
+			var aitypes = []int{AI_TYPE_BELOW_AVERAGE, AI_TYPE_AVERAGE, AI_TYPE_GOOD}
+			t.player.aiType = aitypes[t.random.Intn(3)]
 		}
 		row, col := t.GetAIMove(t.player.aiType)
 		if row > -1 && col > -1 {
@@ -599,7 +584,52 @@ func (t *TicTacToe) DelayElapsed(delta int64) bool {
 
 }
 
-func (t *TicTacToe) GetSecondPlace(currow int, curcol int, playerType int) (int, int) {
+func (t *TicTacToe) CanPlayerWin(row int, col int, playerType int) bool {
+	var isWin bool = false
+
+	if row == 0 && col == 0 {
+		//check col, row, dia
+		isWin = (t.cell[1][0] == playerType && t.cell[2][0] == playerType || t.cell[0][1] == playerType && t.cell[0][2] == playerType || t.cell[1][1] == playerType && t.cell[2][2] == playerType)
+	} else if row == 0 && col == 2 {
+		isWin = (t.cell[1][2] == playerType && t.cell[2][2] == playerType || t.cell[0][1] == playerType && t.cell[0][0] == playerType || t.cell[1][1] == playerType && t.cell[2][0] == playerType)
+	} else if row == 2 && col == 0 {
+		isWin = (t.cell[1][0] == playerType && t.cell[0][0] == playerType || t.cell[2][1] == playerType && t.cell[2][2] == playerType || t.cell[1][1] == playerType && t.cell[0][2] == playerType)
+	} else if row == 2 && col == 2 {
+		isWin = (t.cell[1][2] == playerType && t.cell[0][2] == playerType || t.cell[2][1] == playerType && t.cell[2][0] == playerType || t.cell[1][1] == playerType && t.cell[0][0] == playerType)
+	} else if row == 1 && col == 1 {
+		isWin = (t.cell[0][1] == playerType && t.cell[2][1] == playerType || t.cell[1][0] == playerType && t.cell[1][2] == playerType || t.cell[0][0] == playerType && t.cell[2][2] == playerType || t.cell[2][0] == playerType && t.cell[0][2] == playerType)
+	} else if row == 0 && col == 1 {
+		isWin = (t.cell[0][0] == playerType && t.cell[0][2] == playerType || t.cell[1][1] == playerType && t.cell[2][1] == playerType)
+	} else if row == 1 && col == 0 {
+		isWin = (t.cell[1][1] == playerType && t.cell[1][2] == playerType || t.cell[0][0] == playerType && t.cell[2][0] == playerType)
+	} else if row == 2 && col == 1 {
+		isWin = (t.cell[2][0] == playerType && t.cell[2][2] == playerType || t.cell[1][1] == playerType && t.cell[0][1] == playerType)
+	} else if row == 1 && col == 2 {
+		isWin = (t.cell[1][1] == playerType && t.cell[1][0] == playerType || t.cell[0][2] == playerType && t.cell[2][2] == playerType)
+	}
+
+	return isWin
+}
+
+func (t *TicTacToe) GetEmptyRowCol() (int, int) {
+	var row int = -1
+	var col int = -1
+brk1:
+	for currow := 0; currow < NUM_ROW; currow++ {
+		for curcol := 0; curcol < NUM_COL; curcol++ {
+			if t.cell[currow][curcol] == 0 {
+				row, col = t.GetNearPlace(currow, curcol)
+				if row != -1 && col != -1 {
+					break brk1
+				}
+			}
+		}
+	}
+
+	return row, col
+}
+
+func (t *TicTacToe) GetNearPlace(currow int, curcol int) (int, int) {
 	var row int = -1
 	var col int = -1
 
@@ -698,12 +728,317 @@ func (t *TicTacToe) GetSecondPlace(currow int, curcol int, playerType int) (int,
 	return row, col
 }
 
+func (t *TicTacToe) GetNextEmptyCell() (int, int) {
+
+	var row int = -1
+	var col int = -1
+
+nec:
+	for i := 0; i < NUM_ROW; i++ {
+		for j := 0; j < NUM_COL; j++ {
+			if t.cell[i][j] == 0 {
+				row = i
+				col = j
+				break nec
+			}
+		}
+	}
+
+	return row, col
+}
+
+func (t *TicTacToe) GetRandEmptyCell() (int, int) {
+	var row int = -1
+	var col int = -1
+	for cnt := 0; cnt < 9; cnt++ {
+		i := t.random.Intn(NUM_ROW)
+		j := t.random.Intn(NUM_COL)
+		if t.cell[i][j] == 0 {
+			row = i
+			col = j
+			break
+		}
+	}
+	return row, col
+}
+
+func (t *TicTacToe) GetHumanWinCell() (int, int) {
+	var row int = -1
+	var col int = -1
+
+hwc:
+	for r := 0; r < NUM_ROW; r++ {
+		for c := 0; c < NUM_COL; c++ {
+			if t.cell[r][c] == 0 {
+				if t.CanPlayerWin(r, c, HUMAN_PLAYER) {
+					row = r
+					col = c
+
+					break hwc
+				}
+			}
+		}
+	}
+
+	return row, col
+}
+
+func (t *TicTacToe) GetAIWinCell() (int, int) {
+	var row int = -1
+	var col int = -1
+
+aiwc:
+	for r := 0; r < NUM_ROW; r++ {
+		for c := 0; c < NUM_COL; c++ {
+			if t.cell[r][c] == 0 {
+				if t.CanPlayerWin(r, c, AI_PLAYER) {
+					row = r
+					col = c
+
+					break aiwc
+				}
+			}
+		}
+	}
+
+	return row, col
+}
+
+func (t *TicTacToe) GetAINearCell() (int, int) {
+	var row int = -1
+	var col int = -1
+ainc:
+	for r := 0; r < NUM_ROW; r++ {
+		for c := 0; c < NUM_COL; c++ {
+			if t.cell[r][c] == AI_PLAYER {
+				row, col = t.GetNearPlace(r, c)
+				if row != -1 && col != -1 {
+					break ainc
+				}
+			}
+		}
+	}
+
+	return row, col
+}
+
+/*
+func (t *TicTacToe) GetBelowAvgAIMove() (int, int) {
+	var row int = -1
+	var col int = -1
+	var turn int = t.numAIMove + t.numHumanMove
+
+	switch turn {
+	case TURN1:
+		row, col = t.GetRandEmptyCell()
+
+	case TURN2, TURN3, TURN4:
+		row, col = t.GetEmptyRowCol()
+		if row == -1 || col == -1 {
+			row, col = t.GetRandEmptyCell()
+		}
+	case TURN5, TURN6, TURN7, TURN8:
+		row, col = t.GetRandEmptyCell()
+		if row == -1 || col == -1 {
+			row, col = t.GetAINearCell()
+		}
+	}
+
+	return row, col
+}
+
+func (t *TicTacToe) GetAvgAIMove() (int, int) {
+
+	var row int = -1
+	var col int = -1
+	var turn int = t.numAIMove + t.numHumanMove
+
+	switch turn {
+	case TURN1:
+		row, col = t.GetRandEmptyCell()
+	case TURN2:
+
+		row, col = t.GetEmptyRowCol()
+
+	case TURN3, TURN4:
+		row, col = t.GetAINearCell()
+	case TURN5:
+
+		row, col = t.GetAIWinCell()
+
+		if row == -1 || col == -1 {
+			row, col = t.GetEmptyRowCol()
+		}
+
+	case TURN6, TURN7, TURN8, TURN9:
+		row, col = t.GetAIWinCell()
+
+		if row == -1 || col == -1 {
+			row, col = t.GetAINearCell()
+		}
+	}
+
+	return row, col
+}
+
+func (t *TicTacToe) GetGoodAIMove() (int, int) {
+
+	var row int = -1
+	var col int = -1
+	var turn int = t.numAIMove + t.numHumanMove
+
+	switch turn {
+	case TURN1:
+		row, col = t.GetRandEmptyCell()
+	case TURN2:
+
+		row, col = t.GetEmptyRowCol()
+
+	case TURN3:
+		row, col = t.GetAINearCell()
+	case TURN4:
+		row, col = t.GetHumanWinCell()
+
+		if row == -1 || col == -1 {
+			row, col = t.GetAINearCell()
+		}
+
+	case TURN5:
+		row, col = t.GetAIWinCell()
+
+		if row == -1 || col == -1 {
+			row, col = t.GetHumanWinCell()
+		}
+
+		if row == -1 || col == -1 {
+			row, col = t.GetEmptyRowCol()
+		}
+
+		if row == -1 || col == -1 {
+			row, col = t.GetAINearCell()
+		}
+
+	case TURN6, TURN7, TURN8, TURN9:
+		row, col = t.GetAIWinCell()
+
+		if row == -1 || col == -1 {
+			row, col = t.GetHumanWinCell()
+		}
+
+		if row == -1 || col == -1 {
+			row, col = t.GetAINearCell()
+		}
+
+	}
+
+	return row, col
+}
+
+
 func (t *TicTacToe) GetAIMove(aiType int) (int, int) {
 
 	var row int = -1
 	var col int = -1
 
-	if aiType == AI_TYPE_AVERAGE {
+	if aiType == AI_TYPE_BELOW_AVERAGE {
+		row, col = t.GetBelowAvgAIMove()
+
+	} else if aiType == AI_TYPE_AVERAGE {
+		row, col = t.GetAvgAIMove()
+	} else if aiType == AI_TYPE_GOOD {
+		row, col = t.GetGoodAIMove()
+	}
+
+	if row == -1 || col == -1 {
+		row, col = t.GetNextEmptyCell()
+	}
+
+	t.PrintCell()
+
+	fmt.Printf("\n row = %d, col = %d", row, col)
+
+	return row, col
+}
+
+
+*/
+
+func (t *TicTacToe) PrintCell() {
+
+	for i := 0; i < NUM_ROW; i++ {
+		fmt.Println()
+		for j := 0; j < NUM_COL; j++ {
+			fmt.Printf("%d ", t.cell[j][i])
+		}
+
+	}
+
+}
+
+func (t *TicTacToe) GetAIMove(aiType int) (int, int) {
+
+	var row int = -1
+	var col int = -1
+
+	if aiType == AI_TYPE_AVERAGE || aiType == AI_TYPE_GOOD {
+
+		if t.numAIMove == 0 {
+
+			row, col = t.GetRandEmptyCell()
+
+		} else if t.numAIMove == 1 {
+			if t.numHumanMove == 2 {
+				// check if possible of human win
+				row, col = t.GetHumanWinCell()
+			}
+			if row == -1 {
+
+				row, col = t.GetAINearCell()
+			}
+
+			if row == -1 {
+				row, col = t.GetRandEmptyCell()
+			}
+		} else if t.numAIMove > 1 {
+			row, col = t.GetAIWinCell()
+
+			if row == -1 {
+				row, col = t.GetHumanWinCell()
+			}
+
+			if row == -1 {
+				row, col = t.GetAINearCell()
+			}
+
+			if row == -1 {
+
+				row, col = t.GetRandEmptyCell()
+			}
+		}
+
+		if row == -1 {
+			row, col = t.GetNextEmptyCell()
+		}
+
+	} else if aiType == AI_TYPE_BELOW_AVERAGE {
+		row, col = t.GetNextEmptyCell()
+	}
+
+	t.PrintCell()
+
+	fmt.Printf("\n row = %d, col = %d", row, col)
+
+	return row, col
+
+}
+
+/*
+func (t *TicTacToe) GetAIMove(aiType int) (int, int) {
+
+	var row int = -1
+	var col int = -1
+
+	if aiType == AI_TYPE_AVERAGE || aiType == AI_TYPE_GOOD {
 
 		if t.numAIMove == 0 {
 
@@ -738,7 +1073,7 @@ func (t *TicTacToe) GetAIMove(aiType int) (int, int) {
 				for i := 0; i < NUM_ROW; i++ {
 					for j := 0; j < NUM_COL; j++ {
 						if t.cell[i][j] == AI_PLAYER {
-							r, c := t.GetSecondPlace(i, j, AI_PLAYER)
+							r, c := t.GetNearPlace(i, j)
 							if r != -1 && c != -1 {
 								row = r
 								col = c
@@ -794,7 +1129,7 @@ func (t *TicTacToe) GetAIMove(aiType int) (int, int) {
 				for i := 0; i < NUM_ROW; i++ {
 					for j := 0; j < NUM_COL; j++ {
 						if t.cell[i][j] == AI_PLAYER {
-							r, c := t.GetSecondPlace(i, j, AI_PLAYER)
+							r, c := t.GetNearPlace(i, j)
 							if r != -1 && c != -1 {
 								row = r
 								col = c
@@ -845,6 +1180,11 @@ func (t *TicTacToe) GetAIMove(aiType int) (int, int) {
 		}
 	}
 
+	t.PrintCell()
+
+	fmt.Printf("\n row = %d, col = %d", row, col)
+
 	return row, col
 
 }
+*/
