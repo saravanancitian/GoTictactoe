@@ -1024,9 +1024,9 @@ func (t *TicTacToe) GetAIMove(aiType int) (int, int) {
 		row, col = t.GetNextEmptyCell()
 	}
 
-	t.PrintCell()
+	// t.PrintCell()
 
-	fmt.Printf("\n row = %d, col = %d", row, col)
+	// fmt.Printf("\n row = %d, col = %d", row, col)
 
 	return row, col
 
