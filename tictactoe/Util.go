@@ -4,8 +4,9 @@ import (
 	"image/png"
 	"path"
 	"tictactoe/tictactoe/assets"
-	"golang.org/x/image/font/opentype"
+
 	"github.com/hajimehoshi/ebiten/v2"
+	"golang.org/x/image/font/opentype"
 )
 
 func LoadImage(filename string) (*ebiten.Image, error) {
@@ -27,7 +28,7 @@ func LoadImage(filename string) (*ebiten.Image, error) {
 	return fileimage, nil
 }
 
-func LoadFont(filename string)  (*opentype.Font, error){
+func LoadFont(filename string) (*opentype.Font, error) {
 	const dir = "fonts"
 	data, err := assets.Fonts.ReadFile(path.Join(dir, filename))
 	if err != nil {
@@ -41,4 +42,15 @@ func LoadFont(filename string)  (*opentype.Font, error){
 	}
 
 	return tt, nil
+}
+
+func LoadAudio(filename string) ([]byte, error) {
+	const dir = "audio"
+
+	data, err := assets.Audios.ReadFile(path.Join(dir, filename))
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }

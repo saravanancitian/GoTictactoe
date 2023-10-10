@@ -17,9 +17,15 @@ const (
 )
 
 const (
-	APP_STATE_INIT    int = 1
-	APP_STATE_RUNNING int = 2
-	APP_STATE_PAUSED  int = 3
+	APP_STATE_INIT      int = 1
+	APP_STATE_RUNNING   int = 2
+	APP_STATE_PAUSED    int = 3
+	APP_STATE_DESTROYED int = 4
+)
+
+const (
+	WINDOWSTATE_MAXIMIZED int = 1
+	WINDOWSTATE_MINIMIZED int = 2
 )
 
 type App struct {
@@ -30,11 +36,14 @@ type App struct {
 	screenWidth  int
 	screenHeight int
 
-	prevTime    int64
-	curTime     int64
-	state       int
-	prevState   int
-	scalefactor float64
+	prevTime            int64
+	curTime             int64
+	state               int
+	windowState         int
+	prevState           int
+	scalefactor         float64
+	settingSoundoff     bool
+	settingShowTimeroff bool
 
 	rm *ResourceManager
 }
@@ -44,13 +53,26 @@ func (app *App) Init() {
 	app.scalefactor = 1
 	app.prevState = -1
 	app.state = -1
+	app.windowState = WINDOWSTATE_MAXIMIZED
 	app.SetState(APP_STATE_INIT)
 }
 
 func (app *App) Update() error {
+	if ebiten.IsWindowBeingClosed() {
+		app.Destroy()
+	} else if ebiten.IsWindowMinimized() {
+		app.Pause()
+		app.windowState = WINDOWSTATE_MINIMIZED
+	} else if app.windowState == WINDOWSTATE_MINIMIZED {
+		app.windowState = WINDOWSTATE_MAXIMIZED
+		app.Resume()
+	}
+
 	switch app.state {
 	case APP_STATE_INIT:
 		app.ttt = NewTicTacToe(app.rm, app.screenWidth, app.screenHeight, app.gameovercallback)
+		app.ttt.SetShowTimerOff(app.settingShowTimeroff)
+		app.ttt.SetSoundOff(app.settingSoundoff)
 		app.SetState(APP_STATE_RUNNING)
 	case APP_STATE_RUNNING:
 		app.curTime = time.Now().UnixMilli()
@@ -87,8 +109,15 @@ func (app *App) Resume() {
 	}
 }
 
+func (app *App) Destroy() {
+	app.state = APP_STATE_DESTROYED
+	app.rm.UnloadResources()
+}
+
 func (app *App) Draw(screen *ebiten.Image) {
-	app.ttt.Draw(screen)
+	if app.state != APP_STATE_DESTROYED {
+		app.ttt.Draw(screen)
+	}
 }
 
 func (app *App) Layout(ow, oh int) (int, int) {
@@ -104,6 +133,20 @@ func (app *App) RegisterIGameCallback(callback func(int, int64)) {
 
 func (app *App) PlayAgain() {
 	app.ttt.StartNewGame()
+}
+
+func (app *App) SetSoundOff(off bool) {
+	app.settingSoundoff = off
+	if app.ttt != nil {
+		app.ttt.SetSoundOff(off)
+	}
+}
+
+func (app *App) SetShowTimerOff(off bool) {
+	app.settingShowTimeroff = off
+	if app.ttt != nil {
+		app.ttt.SetShowTimerOff(off)
+	}
 }
 
 func NewApp() *App {

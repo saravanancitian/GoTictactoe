@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	"golang.org/x/image/font"
@@ -67,8 +68,14 @@ type TicTacToe struct {
 	youwin *ebiten.Image
 	loser  *ebiten.Image
 	tide   *ebiten.Image
-	gx     int
-	gy     int
+
+	winSnd   *audio.Player
+	loseSnd  *audio.Player
+	crossSnd *audio.Player
+	roundSnd *audio.Player
+
+	gx int
+	gy int
 
 	gameScreenWidth  int
 	gameScreenHeight int
@@ -104,6 +111,9 @@ type TicTacToe struct {
 	showTimer bool
 	showMsg   bool
 
+	settingTimerOff bool
+	settingSoundOff bool
+
 	txtMsg string
 
 	random        *rand.Rand
@@ -114,8 +124,39 @@ type TicTacToe struct {
 	s2 image.Point
 }
 
+func (t *TicTacToe) SetSoundOff(off bool) {
+	t.settingSoundOff = off
+}
+
+func (t *TicTacToe) SetShowTimerOff(off bool) {
+	t.settingTimerOff = off
+}
+
 func (t *TicTacToe) SetCallback(callback func(int, int64)) {
 	t.GameOverCallBack = callback
+}
+
+func (t *TicTacToe) LoadSnd(rm *ResourceManager) {
+	var err error
+	t.crossSnd, err = rm.LoadMp3Audio("cross.mp3")
+	if err != nil {
+		panic(err)
+	}
+
+	t.roundSnd, err = rm.LoadMp3Audio("round.mp3")
+	if err != nil {
+		panic(err)
+	}
+
+	t.winSnd, err = rm.LoadMp3Audio("win.mp3")
+	if err != nil {
+		panic(err)
+	}
+
+	t.loseSnd, err = rm.LoadMp3Audio("lose.mp3")
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (t *TicTacToe) LoadSprite(rm *ResourceManager) {
@@ -159,11 +200,13 @@ func NewTicTacToe(rm *ResourceManager, screenWidth int, screenHeight int, callba
 
 func (t *TicTacToe) Init(rm *ResourceManager, screenWidth int, screenHeight int, callback func(int, int64)) {
 
+	t.settingSoundOff = false
+	t.settingTimerOff = false
 	t.random = rand.New(rand.NewSource(time.Now().UnixNano()))
 	t.rm = rm
 	t.GameOverCallBack = callback
 	t.LoadSprite(rm)
-
+	t.LoadSnd(rm)
 	t.gx = 0
 	t.gy = 0
 	t.gameScreenWidth = screenWidth
@@ -348,9 +391,11 @@ func (t *TicTacToe) Draw(screen *ebiten.Image) {
 	}
 
 	if t.showTimer {
-		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Translate(float64(t.board.x+5), float64(t.board.y-30))
-		text.DrawWithOptions(screen, t.txtTimer, t.normalFont, op)
+		if !t.settingTimerOff {
+			op := &ebiten.DrawImageOptions{}
+			op.GeoM.Translate(float64(t.board.x+5), float64(t.board.y-30))
+			text.DrawWithOptions(screen, t.txtTimer, t.normalFont, op)
+		}
 	}
 
 	var x int = 0
@@ -395,6 +440,13 @@ func (t *TicTacToe) DrawGameOver(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(float64(gx), float64(gy))
 	screen.DrawImage(goimg, op)
+}
+
+func (t *TicTacToe) playSound(sndPlayer *audio.Player) {
+	if !t.settingSoundOff {
+		sndPlayer.Rewind()
+		sndPlayer.Play()
+	}
 }
 
 func (t *TicTacToe) SetStartTurn() {
@@ -463,6 +515,11 @@ func (t *TicTacToe) Update(delta int64) {
 		t.showTimer = true
 		t.txtMsg = TXT_YOUR_TURN
 
+		t.winSnd.Rewind()
+		t.crossSnd.Rewind()
+		t.loseSnd.Rewind()
+		t.roundSnd.Rewind()
+
 	case STATE_AI_PLAYER_TURN:
 		t.CalculatePlayTime(delta)
 
@@ -479,6 +536,7 @@ func (t *TicTacToe) Update(delta int64) {
 				t.animCol = col
 				t.player.circleImgIdx = 0
 				t.state = STATE_ANIMATE_AI_PLAYER
+				go t.playSound(t.roundSnd)
 			}
 		}
 
@@ -497,6 +555,7 @@ func (t *TicTacToe) Update(delta int64) {
 					t.player.crossImgIdx = 0
 					t.state = STATE_ANIMATE_HUMAN_PLAYER
 					t.showMsg = false
+					go t.playSound(t.crossSnd)
 				}
 			}
 		}
@@ -507,8 +566,14 @@ func (t *TicTacToe) Update(delta int64) {
 		t.txtMsg = "Tied"
 		if t.winner == HUMAN_PLAYER {
 			t.txtMsg = "You Win"
+			go t.playSound(t.winSnd)
 		} else if t.winner == AI_PLAYER {
 			t.txtMsg = "You Lose"
+			go t.playSound(t.loseSnd)
+
+		} else {
+			go t.playSound(t.winSnd)
+
 		}
 
 		if IsMobileBuild() && t.GameOverCallBack != nil {
@@ -522,17 +587,19 @@ func (t *TicTacToe) Update(delta int64) {
 		t.CalculatePlayTime(delta)
 		if t.DelayElapsed(delta) {
 			if t.player.circleImgIdx >= NUM_CIRCLE_FRAMES-1 {
-				t.isAnimating = false
-				t.cell[t.animRow][t.animCol] = AI_PLAYER
-				isGameOver, winner := t.CheckGameOver()
-				if isGameOver {
-					t.winner = winner
+				if !t.roundSnd.IsPlaying() {
+					t.isAnimating = false
+					t.cell[t.animRow][t.animCol] = AI_PLAYER
+					isGameOver, winner := t.CheckGameOver()
+					if isGameOver {
+						t.winner = winner
 
-					t.state = STATE_GAME_OVER
-				} else {
-					t.showMsg = true
+						t.state = STATE_GAME_OVER
+					} else {
+						t.showMsg = true
 
-					t.state = STATE_HUMAN_PLAYER_TURN
+						t.state = STATE_HUMAN_PLAYER_TURN
+					}
 				}
 
 			} else {
@@ -545,15 +612,18 @@ func (t *TicTacToe) Update(delta int64) {
 		t.CalculatePlayTime(delta)
 		if t.DelayElapsed(delta) {
 			if t.player.crossImgIdx >= NUM_CROSS_FRAMES-1 {
-				t.isAnimating = false
-				t.cell[t.animRow][t.animCol] = HUMAN_PLAYER
-				isGameOver, winner := t.CheckGameOver()
-				if isGameOver {
-					t.winner = winner
+				if !t.crossSnd.IsPlaying() {
+					t.isAnimating = false
+					t.cell[t.animRow][t.animCol] = HUMAN_PLAYER
 
-					t.state = STATE_GAME_OVER
-				} else {
-					t.state = STATE_AI_PLAYER_TURN
+					isGameOver, winner := t.CheckGameOver()
+					if isGameOver {
+						t.winner = winner
+
+						t.state = STATE_GAME_OVER
+					} else {
+						t.state = STATE_AI_PLAYER_TURN
+					}
 				}
 
 			} else {

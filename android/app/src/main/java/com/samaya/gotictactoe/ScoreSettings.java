@@ -4,7 +4,7 @@ package com.samaya.gotictactoe;
 import java.util.Date;
 
 
-public class Score  implements java.io.Serializable{
+public class ScoreSettings implements java.io.Serializable{
     public static final long SEC_IN_MILLIS = 1000;
     private int totalPlayed;
     private int totalWin;
@@ -12,6 +12,26 @@ public class Score  implements java.io.Serializable{
 
     long date1;
     long date2;
+
+    public boolean isSettingsSound() {
+        return settingsSound;
+    }
+
+    public boolean isSettingShowTimer() {
+        return settingShowTimer;
+    }
+
+    public void setSettingsSound(boolean settingsSound) {
+        this.settingsSound = settingsSound;
+    }
+
+    public void setSettingShowTimer(boolean settingShowTimer) {
+        this.settingShowTimer = settingShowTimer;
+    }
+
+    boolean settingsSound = true;
+
+    boolean settingShowTimer = true;
 
     public long getDate1() {
         return date1;
@@ -42,16 +62,16 @@ public class Score  implements java.io.Serializable{
     long topPlayedTime2;
     long topPlayedTime3;
 
-    private static Score Instance;
-    private Score(){
+    private static ScoreSettings Instance;
+    private ScoreSettings(){
 
         reset();
     }
 
 
-    public static Score getInstance() {
+    public static ScoreSettings getInstance() {
         if(Instance == null){
-            Instance = new Score();
+            Instance = new ScoreSettings();
         }
         return Instance;
     }

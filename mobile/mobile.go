@@ -40,6 +40,18 @@ func Resume() {
 	game.Resume()
 }
 
+func Destroy() {
+	game.Destroy()
+}
+
+func SetSoundOff(off bool) {
+	game.SetSoundOff(off)
+}
+
+func SetShowTimerOff(off bool) {
+	game.SetShowTimerOff(off)
+}
+
 // Dummy is a dummy exported function.
 //
 // gomobile doesn't compile a package that doesn't include any exported function.

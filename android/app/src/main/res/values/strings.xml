@@ -21,4 +21,5 @@
     <string name="top_3_score">Top 3 Score</string>
     <string name="date">Date</string>
     <string name="duration">Duration</string>
+    <string name="settings">Settings</string>
 </resources>

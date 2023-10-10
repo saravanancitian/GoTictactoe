@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
@@ -45,15 +47,17 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
     private  AlertDialog aboutDialog;
     private  AlertDialog resetAlertDialog;
     private AlertDialog scoreDialog;
+    private AlertDialog settingDialog;
 
     private AlertDialog gameOverDialog;
 
-    private  Score score;
+    private ScoreSettings score;
     AssetManager assetManager;
 
     String aboutString = "";
 
     View scoreview;
+    View settingview;
     MaterialTextView txtGameOver;
     EbitenView ebitenView;
 
@@ -84,16 +88,48 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
         if(file.exists()){
             loadScore();
         } else {
-            score = Score.getInstance();
+            score = ScoreSettings.getInstance();
         }
 
         adView.loadAd(adRequest);
         aboutString = readAssetFile(ABOUT_FILE);
         createAboutDialog();
+        createSettingDialog();
         createScoreDialog();
         createResetAlertDialog();
         createGameOverDialog();
         ebitenView =getEbitenView();
+        SwitchMaterial sndSwitch = settingview.findViewById(R.id.snd_switch);
+        sndSwitch.setChecked(score.isSettingsSound());
+
+        sndSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    Mobile.setSoundOff(false);
+                } else {
+                    Mobile.setSoundOff(true);
+                }
+                score.setSettingsSound(isChecked);
+            }
+        });
+
+        SwitchMaterial timerSwitch = settingview.findViewById(R.id.timer_switch);
+        timerSwitch.setChecked(score.isSettingShowTimer());
+        timerSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    Mobile.setShowTimerOff(false);
+
+                } else {
+                    Mobile.setShowTimerOff(true);
+                }
+                score.setSettingShowTimer(isChecked);
+            }
+        });
+
+
     }
 
     private void loadScore(){
@@ -102,13 +138,13 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
        try{
            fis = openFileInput(SCORE_FILE);
            ois = new ObjectInputStream(fis);
-           score = (Score) ois.readObject();
+           score = (ScoreSettings) ois.readObject();
 
        } catch (IOException | ClassNotFoundException e) {
            Log.e("Load Score", e.getMessage());
            crashlytics.recordException(e);
 
-           score = Score.getInstance();
+           score = ScoreSettings.getInstance();
 
 
        } finally {
@@ -206,6 +242,16 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
         gameOverDialog = builder.create();
     }
 
+    void createSettingDialog(){
+
+        settingview = getLayoutInflater().inflate(R.layout.settings,null, false);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+
+        builder.setView(settingview);
+        builder.setNegativeButton("Close", (dialog, which) -> dialog.dismiss());
+        settingDialog = builder.create();
+    }
+
     void createScoreDialog(){
 
         scoreview = getLayoutInflater().inflate(R.layout.score,null, false);
@@ -267,6 +313,7 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
         if (adView != null) {
             adView.destroy();
         }
+        Mobile.destroy();
         super.onDestroy();
     }
     
@@ -279,6 +326,8 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
 
         Mobile.resume();
         this.ebitenView.resumeGame();
+        Mobile.setSoundOff(!score.isSettingsSound());
+        Mobile.setShowTimerOff(!score.isSettingShowTimer());
     }
 
     void showScore(){
@@ -292,11 +341,11 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
         txtTotalTied.setText(String.valueOf(score.getTotalTied()));
 
         Date dt1 = score.getDate1() > 0? new Date( score.getDate1() ): null;
-        long dur1 =  score.getTopPlayedTime1() > 0? score.getTopPlayedTime1()/Score.SEC_IN_MILLIS : 0;
+        long dur1 =  score.getTopPlayedTime1() > 0? score.getTopPlayedTime1()/ ScoreSettings.SEC_IN_MILLIS : 0;
         Date dt2 =  score.getDate2() > 0? new Date(score.getDate2()) : null;
-        long dur2 = score.getTopPlayedTime2() > 0? score.getTopPlayedTime2()/Score.SEC_IN_MILLIS : 0;
+        long dur2 = score.getTopPlayedTime2() > 0? score.getTopPlayedTime2()/ ScoreSettings.SEC_IN_MILLIS : 0;
         Date dt3 =  score.getDate3() > 0?new Date(score.getDate3()) :  null;
-        long dur3 =  score.getTopPlayedTime3() > 0? score.getTopPlayedTime3()/Score.SEC_IN_MILLIS : 0;
+        long dur3 =  score.getTopPlayedTime3() > 0? score.getTopPlayedTime3()/ ScoreSettings.SEC_IN_MILLIS : 0;
 
 
         MaterialTextView t1 = scoreview.findViewById(R.id.tp1);
@@ -326,6 +375,14 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
         if(item.getItemId() == R.id.new_game){
             Mobile.playAgain();
             return  true;
+        } else if(item.getItemId() == R.id.settings) {
+            Bundle bundle = new Bundle();
+            bundle.putString(FirebaseAnalytics.Param.SCREEN_NAME, "Settings Dialog");
+            bundle.putString(FirebaseAnalytics.Param.SCREEN_CLASS, "MainActivity");
+            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle);
+
+            settingDialog.show();
+            return true;
         } else if(item.getItemId() == R.id.score){
             Bundle bundle = new Bundle();
             bundle.putString(FirebaseAnalytics.Param.SCREEN_NAME, "Score Dialog");
