@@ -526,7 +526,7 @@ func (t *TicTacToe) Update(delta int64) {
 	case STATE_AI_PLAYER_TURN:
 		t.CalculatePlayTime(delta)
 		var seletaitype int
-		if t.numAIMove > 3 {
+		if t.numHumanMove > 2 {
 			var aitypes = []int{AI_TYPE_AVERAGE, AI_TYPE_GOOD}
 			seletaitype = aitypes[t.random.Intn(2)]
 		} else {
@@ -1066,6 +1066,8 @@ func (t *TicTacToe) GetAIMove(aiType int) (int, int) {
 
 	// log.Printf("%d", aiType)
 
+	var totalmove int = t.numAIMove + t.numHumanMove
+
 	if t.numAIMove == 0 {
 		row, col = t.GetRandEmptyCell()
 	} else if t.numAIMove == 1 {
@@ -1101,7 +1103,7 @@ func (t *TicTacToe) GetAIMove(aiType int) (int, int) {
 			row, col = t.GetAIWinCell()
 
 			if row == -1 {
-				if t.numAIMove > 3 {
+				if totalmove > 3 {
 					row, col = t.GetHumanWinCell()
 				} else {
 					row, col = t.GetEmptyRowCol()
