@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	"log"
 	"math/rand"
 	"tictactoe/tictactoe/input"
 	"time"
@@ -27,17 +28,17 @@ const (
 	GAME_TIDE                  int = 0
 )
 
-const (
-	TURN1 int = iota
-	TURN2
-	TURN3
-	TURN4
-	TURN5
-	TURN6
-	TURN7
-	TURN8
-	TURN9
-)
+// const (
+// 	TURN1 int = iota
+// 	TURN2
+// 	TURN3
+// 	TURN4
+// 	TURN5
+// 	TURN6
+// 	TURN7
+// 	TURN8
+// 	TURN9
+// )
 
 const (
 	HUMAN_PLAYER int = 1
@@ -118,7 +119,7 @@ type TicTacToe struct {
 
 	random        *rand.Rand
 	prevTurnStart int
-	toggleRand    bool
+	// toggleRand    bool
 
 	s1 image.Point
 	s2 image.Point
@@ -140,22 +141,22 @@ func (t *TicTacToe) LoadSnd(rm *ResourceManager) {
 	var err error
 	t.crossSnd, err = rm.LoadMp3Audio("cross.mp3")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	t.roundSnd, err = rm.LoadMp3Audio("round.mp3")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	t.winSnd, err = rm.LoadMp3Audio("win.mp3")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	t.loseSnd, err = rm.LoadMp3Audio("lose.mp3")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 }
 
@@ -163,22 +164,22 @@ func (t *TicTacToe) LoadSprite(rm *ResourceManager) {
 	var err error
 	t.youwin, err = rm.LoadImage("youwin.png")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	t.loser, err = rm.LoadImage("loser.png")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	t.tide, err = rm.LoadImage("tide.png")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	t.JustAnotherHand_ttf, err = rm.LoadFont("JustAnotherHand.ttf")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	t.normalFont, err = opentype.NewFace(t.JustAnotherHand_ttf, &opentype.FaceOptions{
@@ -187,7 +188,7 @@ func (t *TicTacToe) LoadSprite(rm *ResourceManager) {
 		Hinting: font.HintingNone,
 	})
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 }
@@ -474,13 +475,13 @@ func (t *TicTacToe) SetStartTurn() {
 		t.prevTurnStart = AI_PLAYER
 		t.showMsg = false
 
-		t.player.aiType = AI_TYPE_AVERAGE
+		// t.player.aiType = AI_TYPE_AVERAGE
 
-		if t.toggleRand {
-			var aitypes = []int{AI_TYPE_BELOW_AVERAGE, AI_TYPE_AVERAGE, AI_TYPE_GOOD}
-			t.player.aiType = aitypes[t.random.Intn(3)]
-		}
-		t.toggleRand = !t.toggleRand
+		// if t.toggleRand {
+		// 	var aitypes = []int{AI_TYPE_BELOW_AVERAGE, AI_TYPE_AVERAGE, AI_TYPE_GOOD}
+		// 	t.player.aiType = aitypes[t.random.Intn(3)]
+		// }
+		// t.toggleRand = !t.toggleRand
 
 	} else if turn == HUMAN_PLAYER {
 		t.state = STATE_HUMAN_PLAYER_TURN
@@ -524,11 +525,20 @@ func (t *TicTacToe) Update(delta int64) {
 
 	case STATE_AI_PLAYER_TURN:
 		t.CalculatePlayTime(delta)
-
-		if t.player.aiType == AI_TYPE_BELOW_AVERAGE && t.numAIMove > 2 {
+		var seletaitype int
+		if t.numAIMove > 3 {
+			var aitypes = []int{AI_TYPE_AVERAGE, AI_TYPE_GOOD}
+			seletaitype = aitypes[t.random.Intn(2)]
+		} else {
 			var aitypes = []int{AI_TYPE_BELOW_AVERAGE, AI_TYPE_AVERAGE, AI_TYPE_GOOD}
-			t.player.aiType = aitypes[t.random.Intn(3)]
+			seletaitype = aitypes[t.random.Intn(3)]
 		}
+
+		if seletaitype == t.player.aiType && (seletaitype == AI_TYPE_AVERAGE || seletaitype == AI_TYPE_BELOW_AVERAGE) {
+			seletaitype = AI_TYPE_GOOD
+		}
+		t.player.aiType = seletaitype
+
 		row, col := t.GetAIMove(t.player.aiType)
 		if row > -1 && col > -1 {
 			if t.cell[row][col] == 0 {
@@ -1054,37 +1064,58 @@ func (t *TicTacToe) GetAIMove(aiType int) (int, int) {
 	var row int = -1
 	var col int = -1
 
-	if aiType == AI_TYPE_AVERAGE || aiType == AI_TYPE_GOOD {
+	// log.Printf("%d", aiType)
 
-		if t.numAIMove == 0 {
-
-			row, col = t.GetRandEmptyCell()
-
-		} else if t.numAIMove == 1 {
+	if t.numAIMove == 0 {
+		row, col = t.GetRandEmptyCell()
+	} else if t.numAIMove == 1 {
+		if aiType == AI_TYPE_BELOW_AVERAGE {
+			row, col = t.GetNextEmptyCell()
+		} else if aiType == AI_TYPE_AVERAGE {
+			row, col = t.GetAINearCell()
+		} else if aiType == AI_TYPE_GOOD {
 			if t.numHumanMove == 2 {
 				// check if possible of human win
 				row, col = t.GetHumanWinCell()
 			}
 			if row == -1 {
+				row, col = t.GetEmptyRowCol()
+			}
 
+			if row == -1 {
+
+				row, col = t.GetAINearCell()
+			}
+		}
+	} else if t.numAIMove > 1 {
+
+		if aiType == AI_TYPE_BELOW_AVERAGE {
+			if row == -1 {
 				row, col = t.GetAINearCell()
 			}
 
 			if row == -1 {
 				row, col = t.GetRandEmptyCell()
 			}
-		} else if t.numAIMove > 1 {
+		} else if aiType == AI_TYPE_AVERAGE {
 			row, col = t.GetAIWinCell()
 
-			if aiType == AI_TYPE_GOOD {
-				if row == -1 {
+			if row == -1 {
+				if t.numAIMove > 3 {
 					row, col = t.GetHumanWinCell()
+				} else {
+					row, col = t.GetEmptyRowCol()
 				}
-			} else if t.numAIMove > 3 {
+			}
+			if row == -1 {
+				row, col = t.GetAINearCell()
+			}
 
-				if row == -1 {
-					row, col = t.GetHumanWinCell()
-				}
+		} else if aiType == AI_TYPE_GOOD {
+			row, col = t.GetAIWinCell()
+
+			if row == -1 {
+				row, col = t.GetHumanWinCell()
 			}
 
 			if row == -1 {
@@ -1094,24 +1125,12 @@ func (t *TicTacToe) GetAIMove(aiType int) (int, int) {
 			if row == -1 {
 				row, col = t.GetAINearCell()
 			}
-
-			if row == -1 {
-
-				row, col = t.GetRandEmptyCell()
-			}
 		}
-
-		if row == -1 {
-			row, col = t.GetNextEmptyCell()
-		}
-
-	} else if aiType == AI_TYPE_BELOW_AVERAGE {
-		row, col = t.GetNextEmptyCell()
 	}
 
-	// t.PrintCell()
-
-	// fmt.Printf("\n row = %d, col = %d", row, col)
+	if row == -1 {
+		row, col = t.GetNextEmptyCell()
+	}
 
 	return row, col
 
