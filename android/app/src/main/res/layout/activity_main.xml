@@ -21,12 +21,18 @@
     <!-- test: ads:adUnitId="ca-app-pub-3940256099942544/6300978111"-->
     <!-- prod: ads:adUnitId="ca-app-pub-4174135424487607/1661606072" -->
 
-    <com.samaya.gotictactoe.EbitenViewWithErrorHandling
-        android:id="@+id/ebitenview"
+    <FrameLayout
+        android:id="@+id/gameframe"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:focusable="true"
-        android:layout_gravity="bottom"
-        />
+        android:layout_gravity="bottom"/>
+
+<!--    <com.samaya.gotictactoe.EbitenViewWithErrorHandling-->
+<!--        android:id="@+id/ebitenview"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:focusable="true"-->
+<!--        android:layout_gravity="bottom"-->
+<!--        />-->
 
 </androidx.appcompat.widget.LinearLayoutCompat>

@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -98,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
         createScoreDialog();
         createResetAlertDialog();
         createGameOverDialog();
-        ebitenView =getEbitenView();
+        createEbitenView();
         SwitchMaterial sndSwitch = settingview.findViewById(R.id.snd_switch);
         sndSwitch.setChecked(score.isSettingsSound());
 
@@ -128,7 +129,16 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
                 score.setSettingShowTimer(isChecked);
             }
         });
+    }
 
+
+    private void createEbitenView(){
+        ebitenView = new EbitenViewWithErrorHandling(this);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+        ebitenView.setLayoutParams(params);
+
+        FrameLayout gameframe = findViewById(R.id.gameframe);
+        gameframe.addView(ebitenView);
 
     }
 
@@ -279,14 +289,10 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
         return true;
     }
 
-    public EbitenView getEbitenView() {
-        return this.findViewById(R.id.ebitenview);
-    }
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        finish();
+        finish();;
     }
 
     @Override
@@ -315,6 +321,7 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
         }
         Mobile.destroy();
         super.onDestroy();
+        System.exit(0);
     }
     
     void pauseGame(){

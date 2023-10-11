@@ -17,6 +17,8 @@
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait"
+            android:noHistory="true"
+            android:launchMode="singleInstance"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

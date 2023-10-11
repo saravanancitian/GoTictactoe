@@ -13,9 +13,10 @@ public class Util {
         if(is != null){
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte packet[] = new byte[1024];
+            int len = 0;
 
-            while(is.read(packet) > 0 ){
-                baos.write(packet);
+            while((len = is.read(packet)) > 0 ){
+                baos.write(packet, 0, len);
             }
             retval = baos.toByteArray();
             baos.close();

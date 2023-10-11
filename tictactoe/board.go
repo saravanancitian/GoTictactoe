@@ -52,8 +52,8 @@ func (b *Board) GetXY(row, col int) (int, int) {
 
 	var x, y int = 0, 0
 
-	x = b.x + (row * b.cellwithmargine)
-	y = b.y + (col * b.cellwithmargine)
+	x = b.x + (col * b.cellwithmargine)
+	y = b.y + (row * b.cellwithmargine)
 
 	return x, y
 
@@ -65,8 +65,8 @@ func (b *Board) GetSelectedCell(x, y int) (int, int) {
 		var xfrombx = x - b.x
 		var yfromby = y - b.y
 
-		row := xfrombx / b.cellwithmargine
-		col := yfromby / b.cellwithmargine
+		row := yfromby / b.cellwithmargine
+		col := xfrombx / b.cellwithmargine
 
 		return row, col
 	}

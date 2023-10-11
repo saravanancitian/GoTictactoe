@@ -263,18 +263,18 @@ func (t *TicTacToe) setStrikeLine(row1, col1, row2, col2 int) {
 
 	if row1 == 0 && col1 == 0 && row2 == 0 && col2 == 2 {
 		//(0, 0, 0, 2)
-		x1 = x1 + t.board.cellsize/2
-		y1 = y1 + t.board.cellsize/4
-
-		x2 = x2 + t.board.cellsize/2
-		y2 = y2 + t.board.cellsize/2 + t.board.cellsize/4
-	} else if row1 == 0 && col1 == 0 && row2 == 2 && col2 == 0 {
-		//(0, 0, 2, 0)
 		x1 = x1 + t.board.cellsize/4
 		y1 = y1 + t.board.cellsize/2
 
 		x2 = x2 + t.board.cellsize/2 + t.board.cellsize/4
 		y2 = y2 + t.board.cellsize/2
+	} else if row1 == 0 && col1 == 0 && row2 == 2 && col2 == 0 {
+		//(0, 0, 2, 0)
+		x1 = x1 + t.board.cellsize/2
+		y1 = y1 + t.board.cellsize/4
+
+		x2 = x2 + t.board.cellsize/2
+		y2 = y2 + t.board.cellsize/2 + t.board.cellsize/4
 	} else if row1 == 0 && col1 == 0 && row2 == 2 && col2 == 2 {
 		//(0, 0, 2, 2)
 		x1 = x1 + t.board.cellsize/4
@@ -284,38 +284,39 @@ func (t *TicTacToe) setStrikeLine(row1, col1, row2, col2 int) {
 		y2 = y2 + t.board.cellsize/2 + t.board.cellsize/4
 	} else if row1 == 1 && col1 == 0 && row2 == 1 && col2 == 2 {
 		//(1, 0, 1, 2)
-		x1 = x1 + t.board.cellsize/2
-		y1 = y1 + t.board.cellsize/4
+		x1 = x1 + t.board.cellsize/4
+		y1 = y1 + t.board.cellsize/2
 
-		x2 = x2 + t.board.cellsize/2
-		y2 = y2 + t.board.cellsize/2 + t.board.cellsize/4
+		x2 = x2 + t.board.cellsize/2 + t.board.cellsize/4
+		y2 = y2 + t.board.cellsize/2
 	} else if row1 == 2 && col1 == 0 && row2 == 2 && col2 == 2 {
 		//(2, 0, 2, 2)
+		x1 = x1 + t.board.cellsize/4
+		y1 = y1 + t.board.cellsize/2
+
+		x2 = x2 + t.board.cellsize/2 + t.board.cellsize/4
+		y2 = y2 + t.board.cellsize/2
+	} else if row1 == 2 && col1 == 0 && row2 == 0 && col2 == 2 {
+		//(2, 0, 0, 2)
+		x1 = x1 + t.board.cellsize/4
+		y1 = y1 + t.board.cellsize/2 + t.board.cellsize/4
+
+		x2 = x2 + t.board.cellsize/2 + t.board.cellsize/4
+		y2 = y2 + t.board.cellsize/4
+	} else if row1 == 0 && col1 == 1 && row2 == 2 && col2 == 1 {
+		//(0, 1, 2, 1)
 		x1 = x1 + t.board.cellsize/2
 		y1 = y1 + t.board.cellsize/4
 
 		x2 = x2 + t.board.cellsize/2
 		y2 = y2 + t.board.cellsize/2 + t.board.cellsize/4
-	} else if row1 == 2 && col1 == 0 && row2 == 0 && col2 == 2 {
-		//(2, 0, 0, 2)
-		x1 = x1 + t.board.cellsize/2 + t.board.cellsize/4
-		y1 = y1 + t.board.cellsize/4
-
-		x2 = x2 + t.board.cellsize/4
-		y2 = y2 + t.board.cellsize/2 + t.board.cellsize/4
-	} else if row1 == 0 && col1 == 1 && row2 == 2 && col2 == 1 {
-		//(0, 1, 2, 1)
-		x1 = x1 + t.board.cellsize/4
-		y1 = y1 + t.board.cellsize/2
-		x2 = x2 + t.board.cellsize/2 + t.board.cellsize/4
-		y2 = y2 + t.board.cellsize/2
 	} else if row1 == 0 && col1 == 2 && row2 == 2 && col2 == 2 {
 		//(0, 2, 2, 2)
-		x1 = x1 + t.board.cellsize/4
-		y1 = y1 + t.board.cellsize/2
+		x1 = x1 + t.board.cellsize/2
+		y1 = y1 + t.board.cellsize/4
 
-		x2 = x2 + t.board.cellsize/2 + t.board.cellsize/4
-		y2 = y2 + t.board.cellsize/2
+		x2 = x2 + t.board.cellsize/2
+		y2 = y2 + t.board.cellsize/2 + t.board.cellsize/4
 	}
 
 	t.s1 = image.Point{
@@ -371,7 +372,7 @@ func (t *TicTacToe) CheckGameOver() (bool, int) {
 			t.setStrikeLine(0, 2, 2, 2)
 		}
 
-		if !isGameOver && numMove == ((NUM_COL*NUM_ROW)-1) {
+		if !isGameOver && numMove == (NUM_COL*NUM_ROW) {
 			isGameOver = true
 			winner = GAME_TIDE
 		}
@@ -402,10 +403,11 @@ func (t *TicTacToe) Draw(screen *ebiten.Image) {
 	var y int = 0
 
 	for i := 0; i < NUM_ROW; i++ {
-		x = t.board.x + (t.board.cellwithmargine * i) + t.board.margin
+		y = t.board.y + (t.board.cellwithmargine * i) + t.board.margin
 
 		for j := 0; j < NUM_COL; j++ {
-			y = t.board.y + (t.board.cellwithmargine * j) + t.board.margin
+			x = t.board.x + (t.board.cellwithmargine * j) + t.board.margin
+
 			playerType := t.cell[i][j]
 
 			t.player.Draw(screen, playerType, x, y)
@@ -684,13 +686,15 @@ func (t *TicTacToe) CanPlayerWin(row int, col int, playerType int) bool {
 func (t *TicTacToe) GetEmptyRowCol() (int, int) {
 	var row int = -1
 	var col int = -1
-brk1:
+erc:
 	for currow := 0; currow < NUM_ROW; currow++ {
 		for curcol := 0; curcol < NUM_COL; curcol++ {
 			if t.cell[currow][curcol] == 0 {
-				row, col = t.GetNearPlace(currow, curcol)
-				if row != -1 && col != -1 {
-					break brk1
+				r, c := t.GetNearPlace(currow, curcol)
+				if r != -1 && c != -1 {
+					row = currow
+					col = curcol
+					break erc
 				}
 			}
 		}
@@ -1072,8 +1076,19 @@ func (t *TicTacToe) GetAIMove(aiType int) (int, int) {
 		} else if t.numAIMove > 1 {
 			row, col = t.GetAIWinCell()
 
+			if aiType == AI_TYPE_GOOD {
+				if row == -1 {
+					row, col = t.GetHumanWinCell()
+				}
+			} else if t.numAIMove > 3 {
+
+				if row == -1 {
+					row, col = t.GetHumanWinCell()
+				}
+			}
+
 			if row == -1 {
-				row, col = t.GetHumanWinCell()
+				row, col = t.GetEmptyRowCol()
 			}
 
 			if row == -1 {

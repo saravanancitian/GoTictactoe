@@ -92,6 +92,7 @@ public class ScoreSettings implements java.io.Serializable{
 
         if(topPlayedTime1 == 0){
             topPlayedTime1 = curPlayedTime;
+            date1 = System.currentTimeMillis();
         } else if(curPlayedTime <= topPlayedTime1) {
             topPlayedTime3 = topPlayedTime2;
             date3 = date2;
@@ -119,22 +120,6 @@ public class ScoreSettings implements java.io.Serializable{
             addTopTime(duration);
         }
 
-    }
-
-    public String formattedString(String instr){
-
-        Date dt1 = date1 > 0? new Date(date1 ): new Date();
-        long dur1 =  topPlayedTime1 > 0? topPlayedTime1/SEC_IN_MILLIS : 0;
-        Date dt2 =  date2 > 0? new Date(date2) : new Date();
-        long dur2 =  topPlayedTime2 > 0? topPlayedTime2/SEC_IN_MILLIS: 0;
-        Date dt3 =  date3 > 0?new Date(date3) : new Date();
-        long dur3 =  topPlayedTime3 > 0? topPlayedTime3/SEC_IN_MILLIS: 0;
-
-
-        return String.format(instr, totalPlayed, totalWin, totalTied
-                ,dt1,dt1,dt1 , dur1/60, dur1 % 60
-                ,dt2,dt2,dt2 , dur2/60, dur2 % 60
-                ,dt3,dt3,dt3 , dur3/60, dur3 % 60);
     }
 
     public void reset(){
