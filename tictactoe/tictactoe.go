@@ -535,7 +535,7 @@ func (t *TicTacToe) Update(delta int64) {
 		var seletaitype int
 		if t.totalWin > 100 {
 			seletaitype = AI_TYPE_GOOD
-		} else if t.totalGamePlayed > 100 || t.totalWin > 50 || t.numHumanMove > 2 {
+		} else if t.totalGamePlayed > 150 || t.totalWin > 75 || t.numHumanMove > 2 {
 			var aitypes = []int{AI_TYPE_AVERAGE, AI_TYPE_GOOD}
 			seletaitype = aitypes[t.random.Intn(2)]
 		} else {
