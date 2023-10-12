@@ -15,11 +15,11 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         ads:adSize="BANNER"
-        ads:adUnitId="ca-app-pub-3940256099942544/6300978111"
+        ads:adUnitId="ca-app-pub-4186022078056115/9857189667"
         >
     </com.google.android.gms.ads.AdView>
     <!-- test: ads:adUnitId="ca-app-pub-3940256099942544/6300978111"-->
-    <!-- prod: ads:adUnitId="ca-app-pub-4174135424487607/1661606072" -->
+    <!-- prod: ads:adUnitId="ca-app-pub-4186022078056115/9857189667" -->
 
     <FrameLayout
         android:id="@+id/gameframe"
