@@ -8,9 +8,9 @@
     <string name="btn_no">No</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_reset">Reset</string>
-    <string name="you_win">You Win</string>
-    <string name="you_lose">You Lose</string>
-    <string name="tied_game">Tied the Game</string>
+    <string name="you_won">You Won</string>
+    <string name="i_won">I Won</string>
+    <string name="tied_game">Game Tied</string>
     <string name="game_over">Game Over</string>
     <string name="btn_play_again">Play Again</string>
     <string name="btn_exit">Exit</string>

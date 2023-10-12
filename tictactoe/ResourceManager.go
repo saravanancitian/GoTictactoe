@@ -99,17 +99,19 @@ func (r *ResourceManager) GetFont(name string) *opentype.Font {
 func (r *ResourceManager) UnloadResources() {
 
 	//unload images
-	for _, val := range r.images {
+	for key, val := range r.images {
 		val.Dispose()
+		delete(r.images, key)
 	}
 
-	// for _, val := range r.fonts {
-	// 	val.Dispose()
-	// }
+	for key, _ := range r.fonts {
+		delete(r.fonts, key)
+	}
 
 	// unload audio
-	for _, val := range r.audios {
+	for key, val := range r.audios {
 		val.Close()
+		delete(r.audios, key)
 	}
 }
 

@@ -59,6 +59,10 @@ const (
 
 	TXT_YOUR_TURN string = "Your Turn"
 
+	TXT_YOU_WON string = "You Won"
+	TXT_I_WON   string = "I Won"
+	TXT_TIED    string = "Tied"
+
 	ANIM_DELAY    int64 = 100
 	SEC_IN_MILLIS int64 = 1000
 )
@@ -66,9 +70,9 @@ const (
 type TicTacToe struct {
 	GameOverCallBack func(int, int64)
 
-	youwin *ebiten.Image
-	loser  *ebiten.Image
-	tide   *ebiten.Image
+	youwin   *Dialog
+	gamelost *Dialog
+	gametide *Dialog
 
 	winSnd   *audio.Player
 	loseSnd  *audio.Player
@@ -165,20 +169,6 @@ func (t *TicTacToe) LoadSnd(rm *ResourceManager) {
 
 func (t *TicTacToe) LoadSprite(rm *ResourceManager) {
 	var err error
-	t.youwin, err = rm.LoadImage("youwin.png")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	t.loser, err = rm.LoadImage("loser.png")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	t.tide, err = rm.LoadImage("tide.png")
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	t.JustAnotherHand_ttf, err = rm.LoadFont("JustAnotherHand.ttf")
 	if err != nil {
@@ -219,6 +209,10 @@ func (t *TicTacToe) Init(rm *ResourceManager, screenWidth int, screenHeight int,
 	t.board = NewBoard()
 	t.player = NewPlayer()
 	t.player.LoadSprite(rm)
+
+	t.youwin = NewDialog(150, 100, TXT_YOU_WON, color.RGBA{251, 206, 105, 0xff}, color.RGBA{0xff, 0xff, 0xff, 0xff}, 4, t.normalFont)
+	t.gamelost = NewDialog(150, 100, TXT_I_WON, color.RGBA{251, 206, 105, 0xff}, color.RGBA{0xff, 0xff, 0xff, 0xff}, 4, t.normalFont)
+	t.gametide = NewDialog(150, 100, TXT_TIED, color.RGBA{251, 206, 105, 0xff}, color.RGBA{0xff, 0xff, 0xff, 0xff}, 4, t.normalFont)
 
 	x := (screenWidth - t.board.width) / 2
 	y := (screenHeight - t.board.height) / 2
@@ -435,21 +429,19 @@ func (t *TicTacToe) Draw(screen *ebiten.Image) {
 func (t *TicTacToe) DrawGameOver(screen *ebiten.Image) {
 
 	vector.DrawFilledRect(screen, float32(t.board.x), float32(t.board.y), float32(t.board.width), float32(t.board.height), t.overlayColor, false)
-	var goimg *ebiten.Image
+	var dialog *Dialog
 	if t.winner == HUMAN_PLAYER {
-		goimg = t.youwin
+		dialog = t.youwin
 	} else if t.winner == AI_PLAYER {
-		goimg = t.loser
+		dialog = t.gamelost
 	} else {
-		goimg = t.tide
+		dialog = t.gametide
 	}
 
 	gx := t.board.x + (t.board.width-GAMEOVER_WIDTH)/2
 	gy := t.board.y + (t.board.height-GAMEOVER_HEIGHT)/2
 
-	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(float64(gx), float64(gy))
-	screen.DrawImage(goimg, op)
+	dialog.Draw(screen, gx, gy)
 }
 
 func (t *TicTacToe) playSound(sndPlayer *audio.Player) {
@@ -586,13 +578,13 @@ func (t *TicTacToe) Update(delta int64) {
 
 		t.isGameover = true
 		t.showMsg = true
-		t.txtMsg = "Tied"
+		t.txtMsg = TXT_TIED
 		if t.winner == HUMAN_PLAYER {
 			t.totalWin++
-			t.txtMsg = "You Win"
+			t.txtMsg = TXT_YOU_WON
 			go t.playSound(t.winSnd)
 		} else if t.winner == AI_PLAYER {
-			t.txtMsg = "You Lose"
+			t.txtMsg = TXT_I_WON
 			go t.playSound(t.loseSnd)
 
 		} else {

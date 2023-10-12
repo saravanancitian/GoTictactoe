@@ -418,7 +418,7 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
 
         runOnUiThread(() -> {
             try {
-                String message  = getString( winner == HUMAN_PLAYER? R.string.you_win : winner == AI_PLAYER ? R.string.you_lose : R.string.tied_game);
+                String message  = getString( winner == HUMAN_PLAYER? R.string.you_won : winner == AI_PLAYER ? R.string.i_won : R.string.tied_game);
                 txtGameOver.setText(message);
                 gameOverDialog.show();
             } catch (Exception e){
