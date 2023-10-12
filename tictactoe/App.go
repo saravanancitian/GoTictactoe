@@ -131,8 +131,8 @@ func (app *App) RegisterIGameCallback(callback func(int, int64)) {
 	app.gameovercallback = callback
 }
 
-func (app *App) PlayAgain() {
-	app.ttt.StartNewGame()
+func (app *App) PlayAgain(ngameplayed, nwin int) {
+	app.ttt.StartNewGame(ngameplayed, nwin)
 }
 
 func (app *App) SetSoundOff(off bool) {

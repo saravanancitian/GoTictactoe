@@ -245,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(MainActivity.this);
         builder.setTitle(R.string.game_over);
         builder.setView(gameoverView);
-        builder.setPositiveButton(R.string.btn_play_again, (dialog, id) -> Mobile.playAgain());
+        builder.setPositiveButton(R.string.btn_play_again, (dialog, id) -> Mobile.playAgain(score.getTotalPlayed(), score.getTotalWin()));
         builder.setNegativeButton(R.string.btn_exit, (dialog, id) -> finish());
         builder.setNeutralButton(R.string.btn_view_board, (dialog, which) -> dialog.cancel());
 
@@ -380,7 +380,7 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         if(item.getItemId() == R.id.new_game){
-            Mobile.playAgain();
+            Mobile.playAgain(score.getTotalPlayed(), score.getTotalWin());
             return  true;
         } else if(item.getItemId() == R.id.settings) {
             Bundle bundle = new Bundle();

@@ -28,8 +28,8 @@ func RegisterGameCallback(callback IGameCallback) {
 	game.RegisterIGameCallback(func(winner int, duration int64) { callback.GameOverCallBack(winner, duration) })
 }
 
-func PlayAgain() {
-	game.PlayAgain()
+func PlayAgain(ngameplayed, nwin int) {
+	game.PlayAgain(ngameplayed, nwin)
 }
 
 func Pause() {

@@ -123,6 +123,9 @@ type TicTacToe struct {
 
 	s1 image.Point
 	s2 image.Point
+
+	totalGamePlayed int
+	totalWin        int
 }
 
 func (t *TicTacToe) SetSoundOff(off bool) {
@@ -224,11 +227,15 @@ func (t *TicTacToe) Init(rm *ResourceManager, screenWidth int, screenHeight int,
 	t.overlayColor = color.RGBA{50, 50, 50, 150}
 
 	t.prevTurnStart = 0
-	t.StartNewGame()
+	t.totalGamePlayed = 0
+	t.totalWin = 0
+	t.StartNewGame(t.totalGamePlayed, t.totalWin)
 }
 
-func (t *TicTacToe) StartNewGame() {
+func (t *TicTacToe) StartNewGame(ngameplayed, nwin int) {
 	t.state = STATE_INIT_NEW_GAME
+	t.totalGamePlayed = ngameplayed
+	t.totalWin = nwin
 }
 
 func (t *TicTacToe) ResetBoard() {
@@ -497,7 +504,7 @@ func (t *TicTacToe) Update(delta int64) {
 	case STATE_GAME_OVER_HALT:
 		if !IsMobileBuild() {
 			if t.DelayElapsed(delta) {
-				t.StartNewGame()
+				t.StartNewGame(t.totalGamePlayed, t.totalWin)
 			}
 		}
 
@@ -526,7 +533,9 @@ func (t *TicTacToe) Update(delta int64) {
 	case STATE_AI_PLAYER_TURN:
 		t.CalculatePlayTime(delta)
 		var seletaitype int
-		if t.numHumanMove > 2 {
+		if t.totalWin > 100 {
+			seletaitype = AI_TYPE_GOOD
+		} else if t.totalGamePlayed > 100 || t.totalWin > 50 || t.numHumanMove > 2 {
 			var aitypes = []int{AI_TYPE_AVERAGE, AI_TYPE_GOOD}
 			seletaitype = aitypes[t.random.Intn(2)]
 		} else {
@@ -573,10 +582,13 @@ func (t *TicTacToe) Update(delta int64) {
 		}
 
 	case STATE_GAME_OVER:
+		t.totalGamePlayed++
+
 		t.isGameover = true
 		t.showMsg = true
 		t.txtMsg = "Tied"
 		if t.winner == HUMAN_PLAYER {
+			t.totalWin++
 			t.txtMsg = "You Win"
 			go t.playSound(t.winSnd)
 		} else if t.winner == AI_PLAYER {
