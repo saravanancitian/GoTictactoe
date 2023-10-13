@@ -264,7 +264,7 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
 
         settingview = getLayoutInflater().inflate(R.layout.settings,null, false);
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-
+        builder.setTitle(R.string.settings);
         builder.setView(settingview);
         builder.setNegativeButton(R.string.btn_close, (dialog, which) -> dialog.dismiss());
         settingDialog = builder.create();
@@ -274,7 +274,7 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
 
         scoreview = getLayoutInflater().inflate(R.layout.score,null, false);
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-
+        builder.setTitle(R.string.score);
         builder.setView(scoreview);
         builder.setNegativeButton(R.string.btn_cancel, (dialog, which) -> dialog.dismiss());
         builder.setNeutralButton(R.string.btn_reset, (dialog, which) -> resetAlertDialog.show());

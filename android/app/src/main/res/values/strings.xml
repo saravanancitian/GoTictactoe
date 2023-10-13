@@ -2,6 +2,7 @@
     <string name="app_name">GoTicTacToe</string>
     <string name="new_game">New Game</string>
     <string name="score">Score</string>
+
     <string name="about">About</string>
     <string name="reset_alert_text">Resetting the score cannot be undone. Do you wish to reset</string>
     <string name="btn_yes">Yes</string>
