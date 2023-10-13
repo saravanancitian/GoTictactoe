@@ -16,16 +16,14 @@
         android:textStyle="bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:layout_weight="1"/>
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/totalPlayed"
         android:textStyle="bold"
-        android:text=""
+        android:hint="total played"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:layout_weight="1" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
@@ -45,9 +43,8 @@
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/totalWin"
-            android:text=""
             android:textStyle="bold"
-            android:layout_gravity="center"
+            android:hint="total win"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1" />
@@ -69,38 +66,37 @@
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/totalTied"
             android:textStyle="bold"
-            android:text=""
+            android:hint="total tide"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:layout_weight="1" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_gravity="center"
-        android:padding="5dp">
-    <com.google.android.material.textview.MaterialTextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:layout_gravity="center"
-        android:text="@string/top_3_score"/>
 
     <TableLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/border"
-        android:padding="10dp">
+        android:padding="10dp"
+        android:layout_marginTop="10dp">
+        <TableRow
+            android:layout_width="match_parent"
+            android:weightSum="1">
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:gravity="center_horizontal"
+                android:text="@string/top_3_score"
+                android:layout_weight="1"/>
+        </TableRow>
         <TableRow
             android:layout_width="match_parent"
             android:weightSum="2">
 
             <com.google.android.material.textview.MaterialTextView
-                android:text="@string/date"
+                android:hint="@string/date"
                 android:gravity="center_horizontal"
                 android:padding="3dip"
                 android:textStyle="bold"
@@ -108,7 +104,7 @@
                 android:layout_weight="1"/>
             <com.google.android.material.textview.MaterialTextView
                 android:gravity="center_horizontal"
-                android:text="@string/duration"
+                android:hint="@string/duration"
                 android:padding="3dip"
                 android:background="@drawable/border"
                 android:textStyle="bold"
@@ -120,14 +116,14 @@
             android:weightSum="2">
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/date1"
-                android:text=""
+                android:hint="@string/date"
                 android:gravity="center_horizontal"
                 android:padding="3dip"
                 android:background="@drawable/border"
                 android:layout_weight="1"/>
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/tp1"
-                android:text=""
+                android:hint="@string/duration"
                 android:gravity="center_horizontal"
                 android:padding="3dip"
                 android:background="@drawable/border"
@@ -139,14 +135,14 @@
             android:weightSum="2">
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/date2"
-                android:text=""
+                android:hint="@string/date"
                 android:gravity="center_horizontal"
                 android:padding="3dip"
                 android:background="@drawable/border"
                 android:layout_weight="1"/>
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/tp2"
-                android:text=""
+                android:hint="@string/duration"
                 android:gravity="center_horizontal"
                 android:padding="3dip"
                 android:background="@drawable/border"
@@ -158,21 +154,20 @@
             android:weightSum="2">
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/date3"
-                android:text=""
+                android:hint="@string/date"
                 android:gravity="center_horizontal"
                 android:padding="3dip"
                 android:background="@drawable/border"
                 android:layout_weight="1"/>
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/tp3"
-                android:text=""
+                android:hint="@string/duration"
                 android:gravity="center_horizontal"
                 android:padding="3dip"
                 android:background="@drawable/border"
                 android:layout_weight="1"/>
         </TableRow>
     </TableLayout>
-    </androidx.appcompat.widget.LinearLayoutCompat>
 
 
 </androidx.appcompat.widget.LinearLayoutCompat>

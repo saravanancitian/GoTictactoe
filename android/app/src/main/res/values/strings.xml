@@ -7,6 +7,7 @@
     <string name="btn_yes">Yes</string>
     <string name="btn_no">No</string>
     <string name="btn_cancel">Cancel</string>
+    <string name="btn_close">Close</string>
     <string name="btn_reset">Reset</string>
     <string name="you_won">You Won</string>
     <string name="i_won">I Won</string>
@@ -18,7 +19,7 @@
     <string name="played">Played:</string>
     <string name="win">Win:</string>
     <string name="tied">Tied:</string>
-    <string name="top_3_score">Top 3 Win</string>
+    <string name="top_3_score">Top 3 Wins</string>
     <string name="date">Date</string>
     <string name="duration">Duration</string>
     <string name="settings">Settings</string>

@@ -266,7 +266,7 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 
         builder.setView(settingview);
-        builder.setNegativeButton("Close", (dialog, which) -> dialog.dismiss());
+        builder.setNegativeButton(R.string.btn_close, (dialog, which) -> dialog.dismiss());
         settingDialog = builder.create();
     }
 
@@ -285,7 +285,7 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
         View aboutView = getLayoutInflater().inflate(R.layout.about, null, false);
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setView(aboutView);
-        builder.setNegativeButton(R.string.btn_cancel, (dialog, which) -> dialog.dismiss());
+        builder.setNegativeButton(R.string.btn_close, (dialog, which) -> dialog.dismiss());
         MaterialTextView txt_about = aboutView.findViewById(R.id.txt_about);
         txt_about.setText(Html.fromHtml(aboutString));
         aboutDialog = builder.create();
