@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">GoTicTacToe</string>
+    <string name="new_game">New Game</string>
+    <string name="score">Score</string>
+
+    <string name="about">About</string>
+    <string name="reset_alert_text">Resetting the score cannot be undone. Do you wish to reset</string>
+    <string name="btn_yes">Yes</string>
+    <string name="btn_no">No</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_close">Close</string>
+    <string name="btn_reset">Reset</string>
+    <string name="you_won">You Won</string>
+    <string name="i_won">I Won</string>
+    <string name="tied_game">Game Tied</string>
+    <string name="game_over">Game Over</string>
+    <string name="btn_play_again">Play Again</string>
+    <string name="btn_exit">Exit</string>
+    <string name="btn_view_board">View Board</string>
+    <string name="played">Played:</string>
+    <string name="win">Win:</string>
+    <string name="tied">Tied:</string>
+    <string name="top_3_score">Top 3 Wins</string>
+    <string name="date">Date</string>
+    <string name="duration">Duration</string>
+    <string name="settings">Settings</string>
+</resources>

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "325091786598",
+    "project_id": "gotictactoe-cba23",
+    "storage_bucket": "gotictactoe-cba23.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:325091786598:android:c352d5a0a2710eaadfd2a7",
+        "android_client_info": {
+          "package_name": "com.samaya.gotictactoe"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1uSYiletQXIk1_esu0iP5eO6pIGY56p4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
