@@ -7,7 +7,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+//import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 
@@ -33,6 +33,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Date;
+import java.util.Optional;
 
 import go.Seq;
 
@@ -64,9 +65,9 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
     EbitenView ebitenView;
 
 
-    public FirebaseAnalytics getmFirebaseAnalytics() {
-        return mFirebaseAnalytics;
-    }
+//    public FirebaseAnalytics getmFirebaseAnalytics() {
+//        return mFirebaseAnalytics;
+//    }
 
     public FirebaseCrashlytics getCrashlytics() {
         return crashlytics;
@@ -118,17 +119,14 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
 
         SwitchMaterial timerSwitch = settingview.findViewById(R.id.timer_switch);
         timerSwitch.setChecked(score.isSettingShowTimer());
-        timerSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    Mobile.setShowTimerOff(false);
+        timerSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if(isChecked){
+                Mobile.setShowTimerOff(false);
 
-                } else {
-                    Mobile.setShowTimerOff(true);
-                }
-                score.setSettingShowTimer(isChecked);
+            } else {
+                Mobile.setShowTimerOff(true);
             }
+            score.setSettingShowTimer(isChecked);
         });
 
 //        Button testcrash = settingview.findViewById(R.id.testcrash);
@@ -159,7 +157,8 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
            score = (ScoreSettings) ois.readObject();
 
        } catch (IOException | ClassNotFoundException e) {
-           Log.e("Load Score", e.getMessage());
+
+           Log.e("Load Score",e.getMessage());
            crashlytics.recordException(e);
 
            score = ScoreSettings.getInstance();
@@ -221,14 +220,14 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
             byte data[] = Util.readFully(is);
             ret = data == null? "" : new String(data);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            Log.e("Reading Asset file", e.getMessage());
         }
         finally {
             if( is != null){
                 try {
                     is.close();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    Log.e("Reading Asset file closing stream", e.getMessage());
                 }
             }
         }
@@ -262,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
 
     void createSettingDialog(){
 
-        settingview = getLayoutInflater().inflate(R.layout.settings,null, false);
+        settingview = getLayoutInflater().inflate(R.layout.settings,null);
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setTitle(R.string.settings);
         builder.setView(settingview);
@@ -272,7 +271,7 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
 
     void createScoreDialog(){
 
-        scoreview = getLayoutInflater().inflate(R.layout.score,null, false);
+        scoreview = getLayoutInflater().inflate(R.layout.score,null);
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setTitle(R.string.score);
         builder.setView(scoreview);
@@ -285,6 +284,7 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
         View aboutView = getLayoutInflater().inflate(R.layout.about, null, false);
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setView(aboutView);
+        builder.setTitle(R.string.about);
         builder.setNegativeButton(R.string.btn_close, (dialog, which) -> dialog.dismiss());
         MaterialTextView txt_about = aboutView.findViewById(R.id.txt_about);
         txt_about.setText(Html.fromHtml(aboutString));
@@ -300,7 +300,7 @@ public class MainActivity extends AppCompatActivity implements IGameCallback {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        finish();;
+        finish();
     }
 
     @Override
